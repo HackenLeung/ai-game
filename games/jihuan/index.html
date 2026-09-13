@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#191610">
+  <meta name="description" content="余烬：一个在浏览器里游玩的荒野文字生存游戏。收集、制作、探索，守住你的最后一簇火。">
+  <title>余烬 · 荒野生存手记</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23171e1a'/%3E%3Cpath d='M35 8c5 16-8 15-4 26 5-1 9-7 9-12 16 16 12 34-7 34C10 56 9 35 24 22c-1 8 1 12 4 13C23 21 35 18 35 8' fill='%23d2ab6e'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="game.js" defer></script>
+  <script src="effects.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body data-phase="day" data-location="camp">
+  <div class="danger-vignette" aria-hidden="true"></div>
+  <svg class="svg-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <symbol id="i-flame" viewBox="0 0 24 24"><path d="M13 2c1 5-4 6-2 10 2-1 3-3 3-5 6 5 7 10 3 14-3 2-8 1-10-1-5-5-2-10 1-13-1 5 0 6 2 7-2-6 3-8 3-12Z"/><path d="M12 15c-3 3-2 6 1 6s4-3 1-5"/></symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20 5c-3-3-7-1-8 2-1-3-5-5-8-2-4 4 1 10 8 15 7-5 12-11 8-15Z"/><path d="m3 12 5 0 2-4 3 8 2-4h6"/></symbol>
+      <symbol id="i-stomach" viewBox="0 0 24 24"><path d="M11 3v5c3 0 3-3 6-2 5 1 6 10 1 14-3 3-7 2-9-1-2-2-5-2-6 0v-5c2-2 4-2 5-1 2 1 3 0 3-2-3-1-4-3-4-8"/><path d="M17 10c2 2 2 5 0 7"/></symbol>
+      <symbol id="i-brain" viewBox="0 0 24 24"><path d="M12 5c-1-4-6-3-6 1-4 0-5 5-2 7-3 3 0 7 3 6 2 4 5 2 5-1V5Zm0 0c1-4 6-3 6 1 4 0 5 5 2 7 3 3 0 7-3 6-2 4-5 2-5-1"/><path d="M6 6c0 2 1 3 3 3M4 13c2-1 4 0 4 2m10-9c0 2-1 3-3 3m5 4c-2-1-4 0-4 2"/></symbol>
+      <symbol id="i-thermometer" viewBox="0 0 24 24"><path d="M9 14V5a3 3 0 0 1 6 0v9a5 5 0 1 1-6 0Z"/><path d="M12 7v11m6-12h3m-3 4h2"/><circle cx="12" cy="18" r="1.5"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 15A9 9 0 0 1 9 3 9 9 0 1 0 20 15Z"/><path d="M18 2v4m-2-2h4m0 4v2m-1-1h2"/></symbol>
+      <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M6 18a5 5 0 1 1 1-10 7 7 0 0 1 13 3 4 4 0 0 1-1 7Z"/></symbol>
+      <symbol id="i-rain" viewBox="0 0 24 24"><path d="M5 14a4 4 0 1 1 2-7 6 6 0 0 1 11 1 3 3 0 1 1 1 6M7 17l-1 3m6-3-1 3m6-3-1 3"/></symbol>
+      <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m16 8-3 5-5 3 3-5 5-3Z"/><path d="M12 1v2m0 18v2M1 12h2m18 0h2"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+      <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 8a3 3 0 0 1 6 1c0 2-3 2-3 5m0 3v.1"/></symbol>
+      <symbol id="i-save" viewBox="0 0 24 24"><path d="M4 3h13l4 4v14H3V3h1Zm3 0v6h9V3M7 21v-8h10v8m-3-18v4"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 15v6h16v-6"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m-5 5 5-5 5 5M4 15v6h16v-6"/></symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 1 8M3 3v7h7"/></symbol>
+      <symbol id="i-sound" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5V4Zm4 4c3 2 3 6 0 8m3-11c5 4 5 10 0 14"/></symbol>
+      <symbol id="i-muted" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5V4Zm5 5 5 6m-5 0 5-6"/></symbol>
+      <symbol id="i-bag" viewBox="0 0 24 24"><path d="M8 7V5a4 4 0 0 1 8 0v2M5 7h14l2 14H3L5 7Z"/><path d="M8 7v4m8-4v4m-8 4h8"/></symbol>
+      <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5C9 3 5 3 2 4v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-7-1-10 1v15ZM5 8l4 1M5 12l4 1m6-4 4-1m-4 5 4-1"/></symbol>
+      <symbol id="i-map" viewBox="0 0 24 24"><path d="m2 5 7-3 6 3 7-3v17l-7 3-6-3-7 3V5Zm7-3v17m6-14v17"/></symbol>
+      <symbol id="i-wood" viewBox="0 0 24 24"><path d="m5 20 13-8c5-3 1-11-3-8L3 12c-4 3 0 10 4 8Z"/><ellipse cx="5" cy="16" rx="3" ry="4" transform="rotate(-25 5 16)"/><path d="m9 12 7-4M9 17l10-6"/></symbol>
+      <symbol id="i-twig" viewBox="0 0 24 24"><path d="M5 22 17 2M9 15l-4-5m7 0V4m2 3 7-1M6 20l7-2"/></symbol>
+      <symbol id="i-grass" viewBox="0 0 24 24"><path d="M10 22C12 12 6 5 3 3c6 1 11 9 10 19m0 0C13 10 17 4 21 2c-1 8-6 12-6 20M9 22C9 17 5 14 2 14c0 4 2 7 7 8Zm7 0c0-6 3-9 6-9-1 5-3 8-6 9ZM7 19h11"/></symbol>
+      <symbol id="i-stone" viewBox="0 0 24 24"><path d="m3 9 6-5 9 1 4 9-5 6H5L2 15l1-6Zm0 0 8 3 7-7m-7 7 6 8m-6-8-6 8"/></symbol>
+      <symbol id="i-flint" viewBox="0 0 24 24"><path d="m14 2 7 10-7 10-10-4 1-9 9-7Zm0 0-4 9 4 11m-4-11 11 1M5 9l5 2-6 7"/></symbol>
+      <symbol id="i-gold" viewBox="0 0 24 24"><path d="m6 8 12-2 4 12-7 4L2 18 6 8Zm0 0 7 4 5-6m-5 6 2 10M7 2v3M2 5l2 2m17-5-2 2"/></symbol>
+      <symbol id="i-relic" viewBox="0 0 24 24"><path d="m12 2 7 5-1 11-6 4-7-5 1-10 6-5Z"/><path d="m12 6 3 3-2 4 2 3-3 2-3-3 2-3-2-3 3-3Z"/></symbol>
+      <symbol id="i-rope" viewBox="0 0 24 24"><path d="M6 19c-6-4-3-13 3-14s12 3 11 9-9 8-13 4-1-10 4-10 7 6 3 8-7-1-5-4 5-1 4 1M6 19l-4 3"/></symbol>
+      <symbol id="i-berry" viewBox="0 0 24 24"><circle cx="8" cy="12" r="4"/><circle cx="16" cy="13" r="4"/><circle cx="11" cy="19" r="3.5"/><path d="M11 9c0-5 3-7 6-7-1 4-3 6-6 7Zm0-1C9 4 6 3 4 4c1 3 4 4 7 4"/></symbol>
+      <symbol id="i-carrot" viewBox="0 0 24 24"><path d="M14 7c-4-1-11 12-11 14 3-1 15-7 14-11l-3-3Zm1 1 5-6m-3 7 6-1m-9-2V1m-7 13 3 2m0-7 3 2"/></symbol>
+      <symbol id="i-mushroom" viewBox="0 0 24 24"><path d="M2 14C2 0 22 0 22 14H2Zm7 0-1 7h8l-1-7M6 10v.1M12 6v.1m6 4v.1"/></symbol>
+      <symbol id="i-meat" viewBox="0 0 24 24"><path d="M8 15c-6-2-5-11 1-12s13 5 11 10c-2 5-7 5-10 3L6 20c1 3-2 4-3 2-3-1-2-4 1-4l4-3Z"/><path d="M10 6c4 0 7 3 7 6"/></symbol>
+      <symbol id="i-fish" viewBox="0 0 24 24"><path d="M17 12c-5-9-11-7-15 0 4 7 10 9 15 0Zm0 0 5-6v12l-5-6ZM8 7c-2 4-2 6 0 10"/><circle cx="5" cy="11" r=".5"/></symbol>
+      <symbol id="i-bowl" viewBox="0 0 24 24"><path d="M2 11h20c0 6-5 10-10 10S2 17 2 11Zm4 11h12M8 2c-3 3 3 3 0 6m5-7c-3 3 3 4 0 7m5-6c-3 3 3 3 0 6"/></symbol>
+      <symbol id="i-flower" viewBox="0 0 24 24"><path d="M12 14v9m0-3c-4 0-6-2-6-5 4 0 6 2 6 5m0-2c4 0 6-2 6-5-4 0-6 2-6 5"/><path d="M9 5c-2-5 8-5 6 0 5-1 7 7 2 7 0 5-10 5-10 0-5 0-3-8 2-7Z"/><circle cx="12" cy="9" r="2"/></symbol>
+      <symbol id="i-medicine" viewBox="0 0 24 24"><path d="M7 3h10v4l4 4v10H3V11l4-4V3Zm0 4h10m-5 4v7m-3-3h6"/></symbol>
+      <symbol id="i-axe" viewBox="0 0 24 24"><path d="m4 22 12-18 3 2L7 23M10 4l6-3 7 6-5 7-5-4"/><path d="m17 3 4 4-3 4"/></symbol>
+      <symbol id="i-pickaxe" viewBox="0 0 24 24"><path d="m5 22 9-16 3 2-9 16M3 4c7-4 15-1 19 9-6-6-12-7-19-9Z"/></symbol>
+      <symbol id="i-spear" viewBox="0 0 24 24"><path d="m3 22 13-14m-4-1L22 1l-4 11-6-5Zm3 1 4-4"/></symbol>
+      <symbol id="i-trap" viewBox="0 0 24 24"><path d="M3 20 7 5h10l4 15H3Zm4-15 5 15L17 5M3 20l9-9 9 9M4 15h16M6 10h12"/></symbol>
+      <symbol id="i-coat" viewBox="0 0 24 24"><path d="M8 3h8l6 6-4 4-2-2v11H8V11l-2 2-4-4 6-6Zm0 0 4 5 4-5m-4 5v14"/></symbol>
+      <symbol id="i-campfire" viewBox="0 0 24 24"><path d="M13 1c1 5-4 5-2 9l3-4c5 5 4 10-2 10s-8-5-5-9c0 4 1 4 2 4-2-5 4-6 4-10ZM3 18l18 5M3 23l18-5"/></symbol>
+      <symbol id="i-tent" viewBox="0 0 24 24"><path d="m12 3 11 18H1L12 3Zm0 5-5 13h10L12 8Zm0-7v2M3 16l-2 1m20-1 2 1"/></symbol>
+      <symbol id="i-beacon" viewBox="0 0 24 24"><path d="m12 2 4 6-4 4-4-4 4-6Zm-3 10-3 9h12l-3-9M12 1V0M4 4 1 2m19 2 3-2M3 10H0m21 0h3M8 17h8"/></symbol>
+      <symbol id="i-tree" viewBox="0 0 24 24"><path d="m12 1-6 8h3l-6 7h5l-4 4h16l-4-4h5l-6-7h3l-6-8ZM12 20v4"/></symbol>
+      <symbol id="i-mountain" viewBox="0 0 24 24"><path d="m1 21 9-18 12 18H1Zm6-12 3 3 3-4m2 1 3-5 5 12"/></symbol>
+      <symbol id="i-water" viewBox="0 0 24 24"><path d="M2 14q3-4 6 0t6 0 8 0M2 20q3-4 6 0t6 0 8 0M7 11V2m-3 3 3 3 3-3m7 6V4m-3 2 3 3 3-3"/></symbol>
+      <symbol id="i-ruins" viewBox="0 0 24 24"><path d="M2 22h20M4 22V7l4-2 2 3v14m4 0V7l3-3 4 3v15M3 4l7-2 4 2 6-2 2 3M4 15h6m4-3h7m-7 6h7"/></symbol>
+      <symbol id="i-rest" viewBox="0 0 24 24"><path d="M2 19h20M4 19v-7h16v7M7 12l2-5h6l3 5M14 4h5l-5 4h5M3 3h4L3 7h4"/></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12c6-10 16-10 22 0-6 10-16 10-22 0Z"/><circle cx="12" cy="12" r="3"/></symbol>
+      <symbol id="i-rabbit" viewBox="0 0 24 24"><path d="M9 11C2-5 12-1 12 9c3-15 10-8 3 3 11 10-16 12-12 1 1-3 4-3 6-2Z"/><path d="M8 15v.1m8 0v.1m-6 4 2 1 2-1"/></symbol>
+      <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M20 2C7 1 1 8 5 16s17 2 15-14ZM3 22 16 7M8 17l-1-6m4 2h5"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="12" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4m-4 5v3"/></symbol>
+      <symbol id="i-wind" viewBox="0 0 24 24"><path d="M2 8h13c6 0 5-7 1-5M1 12h19c5 0 3 8-1 6M3 16h7c5 0 4 7 0 5"/></symbol>
+      <symbol id="i-skull" viewBox="0 0 24 24"><path d="M6 18C-4 5 7-2 16 3c7 4 8 10 2 15v4H6v-4ZM9 19v3m6-3v3"/><path d="m12 13-2 4h4l-2-4Z"/><ellipse cx="7" cy="11" rx="2" ry="3"/><ellipse cx="17" cy="11" rx="2" ry="3"/></symbol>
+      <symbol id="scene-pine" viewBox="0 0 120 260"><path d="m65 1-7 23-6-6-7 23-8 14 10-2-22 25 13-1-9 19-15 15 17-3-11 23-17 18 20-1-8 23-14 21 18-3-7 25 27-9 12 8 2 43 8 3 8-4-2-43 19-9 26 11-13-26 24 5-21-27 9 2-24-30 25 5-14-23-19-21 21 7-14-26-20-22 14 4-15-27-9-21 1-20Z" fill="currentColor" stroke="#131410" stroke-width="1.7" stroke-linejoin="round"/><path d="m64 22-5 226m4-181-14 16m13 13-28 22m28 4 24 20m-26 4-30 28m32 0 26 27M44 64l11-5m-20 53 14-3m28 16 16 10m-75 49 21-7m40 20 21 3m-62 12 14-6m-1 20 8-5m5 16 8 5" fill="none" stroke="#99916a" stroke-opacity=".29" stroke-width="1.2"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="app-shell">
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="余烬，回到生存页面" data-view="explore">
+        <span class="brand-mark"><svg class="icon"><use href="#i-flame"/></svg></span>
+        <span class="brand-name">余烬<span class="brand-en">EMBER</span></span>
+        <span class="brand-divider"></span>
+        <span class="brand-subtitle">荒野求生<br><small>一场关于活着的冒险</small></span>
+      </a>
+      <nav class="main-nav" aria-label="游戏导航">
+        <button class="nav-button active" data-view="explore"><svg class="icon"><use href="#i-compass"/></svg>生存</button>
+        <button class="nav-button" data-view="craft"><svg class="icon"><use href="#i-axe"/></svg>工坊</button>
+        <button class="nav-button" data-view="map"><svg class="icon"><use href="#i-map"/></svg>地图</button>
+      </nav>
+      <div class="header-tools">
+        <span id="save-status" class="save-status"><span></span>已自动保存</span>
+        <button class="icon-button" id="sound-button" data-command="sound" aria-label="开启音效" aria-pressed="false" title="开启音效"><svg class="icon"><use href="#i-muted"/></svg></button>
+        <button class="icon-button" data-command="help" aria-label="生存手册" title="生存手册"><svg class="icon"><use href="#i-help"/></svg></button>
+        <button class="icon-button" data-command="save" aria-label="存档与设置" title="存档与设置"><svg class="icon"><use href="#i-save"/></svg></button>
+      </div>
+    </header>
+
+    <main>
+      <section class="day-heading" aria-label="旅程与时间">
+        <div class="intro">
+          <div class="eyebrow"><span class="small-line"></span> 生存日志 / THE LAST EMBER</div>
+          <h1>别让最后的<span>火光熄灭。</span></h1>
+          <p id="world-hint">森林并不着急。每一次行动，才会让时间向前。</p>
+        </div>
+        <div class="day-clock">
+          <div class="day-clock-top"><span class="season"><svg class="icon"><use href="#i-leaf"/></svg>秋季</span><span class="clock-weather" id="clock-weather"></span></div>
+          <div class="day-clock-main"><span>第 <b id="day-number">01</b> 天</span><span id="game-time">08:00</span></div>
+          <div class="day-track"><span class="track-day"></span><span class="track-dusk"></span><span class="track-night"></span><i id="time-marker"></i></div>
+          <div class="day-track-labels"><span>06:00 日出</span><span id="phase-label">白昼 · 还有 9 小时</span><span>20:00 入夜</span></div>
+        </div>
+      </section>
+
+      <section class="status-grid" aria-label="生存状态" id="status-grid"></section>
+
+      <div class="game-layout">
+        <div class="main-column">
+          <section class="landscape-card" aria-label="当前所在地">
+            <svg class="landscape" viewBox="0 0 1000 390" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="scene-title">
+              <title id="scene-title">松林中，一簇篝火照亮了简陋的营地</title>
+              <defs>
+                <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#6b6753"/><stop offset="1" stop-color="#b1a67b"/></linearGradient>
+                <linearGradient id="ground" x2="0" y2="1"><stop stop-color="#484435"/><stop offset="1" stop-color="#272820"/></linearGradient>
+                <radialGradient id="fire-glow"><stop stop-color="#ffae40" stop-opacity=".56"/><stop offset=".45" stop-color="#e98629" stop-opacity=".17"/><stop offset="1" stop-color="#d49442" stop-opacity="0"/></radialGradient>
+                <linearGradient id="scene-shade" x2="0" y2="1"><stop stop-color="#171611" stop-opacity=".53"/><stop offset=".35" stop-color="#171611" stop-opacity="0"/><stop offset=".73" stop-color="#171611" stop-opacity=".05"/><stop offset="1" stop-color="#171611" stop-opacity=".94"/></linearGradient>
+                <pattern id="ink-hatch" width="8" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(-26)"><path d="M0 0v9m4-5v3" stroke="#15150f" stroke-width=".8" stroke-opacity=".2"/></pattern>
+                <pattern id="paper-grain" width="71" height="67" patternUnits="userSpaceOnUse"><circle cx="3" cy="8" r=".6" fill="#eee3b9" opacity=".13"/><circle cx="45" cy="24" r=".7" fill="#fff" opacity=".09"/><path d="m12 46 2 1m39 14 1-2m23-24 2 1" stroke="#19241b" stroke-opacity=".35"/></pattern>
+              </defs>
+              <rect width="1000" height="390" fill="url(#sky)" class="scene-sky"/>
+              <g class="scene-stars" fill="#eee6c9"><circle cx="400" cy="56" r="1.2"/><circle cx="572" cy="80" r="1"/><circle cx="717" cy="35" r="1.2"/><circle cx="290" cy="103" r="1"/><circle cx="805" cy="113" r=".8"/><circle cx="645" cy="39" r="1.3"/><circle cx="466" cy="114" r=".8"/><circle cx="364" cy="24" r="1.1"/><circle cx="659" cy="118" r="1"/></g>
+              <g class="scene-sun"><circle cx="732" cy="95" r="35" fill="#dece98"/><circle cx="732" cy="95" r="40" fill="none" stroke="#ddd0a0" stroke-opacity=".3" stroke-dasharray="3 6"/></g>
+              <g class="scene-moon"><circle cx="732" cy="95" r="30" fill="#d9d8be"/><circle cx="745" cy="85" r="28" fill="#29352e"/></g>
+              <path d="M0 232 79 178 137 194 248 113 354 182 433 141 557 198 636 145 721 184 817 144 1000 214V390H0Z" fill="#444d3c"/>
+              <path d="m182 172 66-59 69 62-50-29-19-8-28 33-9-10Z" fill="#a29d70" opacity=".2"/>
+              <path d="M0 261 117 221 226 248 320 194 460 243 583 211 686 250 800 217 1000 256V390H0Z" fill="#364331"/>
+              <g color="#2e3d2d" opacity=".8"><use href="#scene-pine" x="34" y="132" width="73" height="158"/><use href="#scene-pine" x="100" y="102" width="77" height="180"/><use href="#scene-pine" x="181" y="151" width="69" height="149"/><use href="#scene-pine" x="322" y="120" width="73" height="178"/><use href="#scene-pine" x="394" y="140" width="66" height="163"/><use href="#scene-pine" x="635" y="141" width="64" height="156"/><use href="#scene-pine" x="787" y="123" width="79" height="180"/><use href="#scene-pine" x="868" y="132" width="62" height="170"/></g>
+              <path d="M0 302c173-33 236 0 356-16 153-23 287-6 390-7 113-1 156 10 254 37v74H0Z" fill="url(#ground)"/>
+              <path d="M541 277c-63 25-77 32-78 60-1 16-54 40-99 53h278c-62-36-54-36-59-59-7-29-27-37-42-54Z" fill="#7b7050" opacity=".22"/>
+              <g class="scene-trees" color="#24291e"><use href="#scene-pine" x="-20" y="15" width="153" height="315"/><use href="#scene-pine" x="119" y="96" width="96" height="235"/><use href="#scene-pine" x="208" y="134" width="74" height="201"/><use href="#scene-pine" x="806" y="71" width="110" height="264"/><use href="#scene-pine" x="911" y="-14" width="150" height="357"/></g>
+              <g class="scene-branches" stroke="#171a13" fill="none" stroke-linecap="round"><path d="M-8 112C28 86 59 44 86-8M14 90l-4-47m31 18 5-47m-5 47 37-19M27 75l39-2m-11-37 35-2M1008 58c-44-12-81-30-110-66m70 50 1-38m-28 26-32 6" stroke-width="8"/><path d="m1 68 8-15m30 9-13-31m20 8 17-24m-3 56 15-9m860-29-18-9m50 10 12-15" stroke-width="3"/></g>
+              <g class="landmark" data-scene="camp">
+                <ellipse cx="542" cy="313" rx="141" ry="30" fill="#192319" opacity=".65"/>
+                <g class="shelter"><path d="m374 294 68-127 139 119-129 29-78-21Z" fill="#81784e"/><path d="m442 167 10 148 129-29-139-119Z" fill="#514e33"/><path d="m380 294 62-127 10 148-72-21Z" fill="#a39962"/><path d="m395 297 48-99 7 111-55-12Z" fill="#2b3224"/><path d="m442 167 139 119m-207 8 78 21 129-29m-133-95 58 85" stroke="#b0a675" stroke-width="1.5" fill="none"/><path d="m442 161 2 20m-74 117 8-9m203-3 6 7m-185-30-47 40m196-40 54 36" stroke="#938761" stroke-width="2" fill="none"/></g>
+                <g class="built-tent"><path d="m358 302 88-160 160 153-151 31-97-24Z" fill="#7d7852"/><path d="m446 142 9 184 151-31-160-153Z" fill="#53533a"/><path d="m383 306 63-134 8 145-71-11Z" fill="#202a20"/><path d="m446 136 9 190 151-31M358 302l88-160 160 153" stroke="#aaa17a" fill="none" stroke-width="2"/><path d="m455 165 116 121m-210 16-18 12m263-19 23 10" stroke="#a69a70" fill="none"/></g>
+                <g transform="translate(343 295) rotate(-8)"><path d="M0 0h25l5 30H-3Z" fill="#6e6240" stroke="#9e8a5b"/><path d="M6 1v-8h13v8M5 13h17v12H5Z" fill="none" stroke="#b09c6b"/></g>
+                <g transform="translate(673 307)"><path d="m0 9 51-11 11 13-52 11Z" fill="#5e5036"/><ellipse cx="9" cy="16" rx="11" ry="7" fill="#89734b" stroke="#b7a177"/><ellipse cx="9" cy="16" rx="5" ry="3" fill="none" stroke="#594e37"/><path d="m23 3 29 0" stroke="#a58b5a"/></g>
+                <g class="beacon-landmark"><path d="m737 287 9-56h20l10 56Z" fill="#7e866c"/><path d="m756 199 13 20-13 15-13-15Z" fill="#d2c581"/><path d="m756 199 13 20-13 15-13-15Z" fill="none" stroke="#e4debb"/><path d="M755 191V97" stroke="#d9d5a0" stroke-width="2" opacity=".3"/><circle cx="756" cy="217" r="35" fill="url(#fire-glow)"/></g>
+              </g>
+              <g class="landmark" data-scene="forest"><path d="m479 299 81-27 12 17-82 31Z" fill="#716143"/><ellipse cx="482" cy="309" rx="13" ry="10" fill="#9c8b60"/><ellipse cx="482" cy="309" rx="7" ry="5" fill="none" stroke="#594f37"/><use href="#scene-pine" x="535" y="76" width="104" height="236" color="#243525"/><path d="M461 322v-16m-10 0c0-16 23-16 23 0Z" fill="#a4835b" stroke="#b49a6e"/><path d="M628 316v-13m-7 0c0-12 17-12 17 0Z" fill="#9c7954"/></g>
+              <g class="landmark" data-scene="meadow" fill="none" stroke="#97925e" stroke-width="2"><path d="M388 316q6-30-7-49m8 50q10-24 24-32m101 28q-5-28 9-49m-9 49q-16-17-22-40m111 46q-8-26 7-42m-7 42q16-19 28-19m65 20q3-26-5-36"/><g stroke="#c2ae75"><path d="M459 326v-43m-5 8 10-12m-10 0 11 12M578 315v-35m-5 6 11-11m-11 0 11 11M680 322v-26m-5 5 10-11m-10 0 10 11"/></g><path d="m415 318 8-13 16-4 9 12-6 7Zm9-13-5-14m9 13 1-16" fill="#a5a087" stroke="#b9b292"/></g>
+              <g class="landmark" data-scene="quarry" stroke="#7c816b" stroke-width="1.5"><path d="m365 298 35-73 86-34 66 44 24 74-87 25Z" fill="#59634f"/><path d="m400 225 78 26 8-60m-8 60 74-16-63 99m-11-83-113 47" fill="none"/><path d="m573 326 7-55 55-20 44 28 4 41-56 16Z" fill="#60634e"/><path d="m594 293 13-15 9 9-13 20Zm32-19 10 6-2 12-8-6Z" fill="#b5a169" stroke="#cbb67c"/></g>
+              <g class="landmark" data-scene="marsh"><ellipse cx="530" cy="309" rx="165" ry="31" fill="#536151"/><path d="M393 305h92m61 12h78m-168-1h40m27-19h73" stroke="#8d9e80" opacity=".5"/><g stroke="#929672" stroke-width="2" fill="none"><path d="M388 317v-52m-7 4 7 15 8-12m260 47v-58m-9 7 9 16 7-13m-31 42v-39m-8 8 8 13 7-10"/></g><path d="m514 308 15-9 7 12-22-3Z" fill="#b7bf91"/></g>
+              <g class="landmark" data-scene="ruins" stroke="#808870" stroke-width="1.5"><path d="m423 315 7-121 33-12 12 13-4 120Z" fill="#606b55"/><path d="m580 315-3-127 25-15 23 17 3 125Z" fill="#59664f"/><path d="m425 194 1-23 50-13 29 9 15-8 68 9 41-4 5 28-61-4-45 5-33-8-70 9Z" fill="#6e775d"/><path d="m433 228 35-3m-39 47 44 3m106-30 46 3m-42-36 36-5m-144-36 6 13 8-6" fill="none"/><path d="m514 308 2-41 22-8 12 13-5 36Z" fill="#879173"/><path d="m532 267-7 11 8 9-6 10" stroke="#d1d1a0" fill="none" stroke-width="3"/><path d="m416 315 11-12 29 6m161-100 4 64-11 16m-175-92-6 46 13-8" stroke="#75834e" stroke-width="4" fill="none"/></g>
+              <g class="camp-flame">
+                <ellipse cx="610" cy="299" rx="106" ry="91" fill="url(#fire-glow)"/>
+                <g class="stone-ring" fill="#7d7e68" stroke="#414938"><ellipse cx="587" cy="323" rx="9" ry="5"/><ellipse cx="602" cy="329" rx="9" ry="5"/><ellipse cx="619" cy="330" rx="9" ry="5"/><ellipse cx="635" cy="324" rx="8" ry="5"/><ellipse cx="637" cy="315" rx="8" ry="5"/><ellipse cx="584" cy="313" rx="8" ry="5"/></g>
+                <path d="m588 317 44 10m-45 0 43-15" stroke="#6b5033" stroke-width="8" stroke-linecap="round"/>
+                <path d="m588 317 44 10m-45 0 43-15" stroke="#ac7b43" stroke-width="2"/>
+                <g class="fire-shapes"><path d="M609 268c8 14-6 19-1 28 4-3 9-10 8-17 25 24 19 44-7 44-23 0-28-20-12-34-2 10 2 11 5 13-4-16 8-21 7-34Z" fill="#ce8644"/><path d="M611 292c3 7-5 11 1 15l5-6c10 12 1 23-8 21s-11-13-5-20c0 7 3 8 4 7-3-7 4-11 3-17Z" fill="#e4b967"/><path d="M612 307c8 8 5 15-2 15s-8-8-2-12c-1 5 2 6 3 4Z" fill="#f1d79a"/></g>
+                <g class="embers" fill="#daa361"><circle cx="604" cy="257" r="1.7"/><circle cx="622" cy="248" r="1"/><circle cx="612" cy="231" r="1.4"/><circle cx="596" cy="239" r=".8"/></g>
+              </g>
+              <g class="survivor" transform="translate(716 241)" stroke="#191812" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="-2" cy="94" rx="25" ry="5" fill="#181c16" stroke="none" opacity=".5"/>
+                <path d="m-11 64-5 24-9 5 16-1 7-27m9 0 2 25 11 4-17-1-4-27" fill="#29261d"/>
+                <path d="m-15 29-9 30 9 9 9-5 8 8 15-6-6-34-26-2Z" fill="#786046"/>
+                <path d="m12 30 11 4 3 29-13 4-1-37Z" fill="#504938"/><path d="m18 39 6 1m-11 10 12 2" fill="none" stroke="#a49366" stroke-width="1"/>
+                <path d="m-17 35-12 21-10-5-2 5 14 6 14-17" fill="#b0a078"/>
+                <path d="m-34 64 8-31" stroke="#a39670" stroke-width="3"/><path d="m-27 33-10-2-5 8 12 3" fill="#8d917e"/>
+                <path d="M-15 2c2-16 23-17 28-2l-1 21-13 13-13-13-1-19Z" fill="#caba91"/>
+                <path d="m-16 9-4-9 7-8 1-10 11 8 8-10 6 12 9 3-7 19-4-12-12 7-6-6-4 16-5-10Z" fill="#25251c"/>
+                <path d="m-12 27 23-4 6 8-28 6-8-7Zm14 8-3 23 9-7 1-17" fill="#8e4630"/>
+                <path d="M-9 10v5m12-5v5m-9 8 7-1" fill="none"/><path d="m-9 43-4 15m21-17 1 19" stroke="#b29b6e" stroke-width="1" fill="none"/>
+              </g>
+              <g fill="none" stroke="#85916a" stroke-width="1" opacity=".5"><path d="m288 330-5-12m5 12 5-7m-8 4-9-3m472 13 2-17m-2 17-8-8m8 5 8-5m-408 31-3-10m3 10 6-9"/></g>
+              <path d="m0 372 32-8 16-13-2 16 24-18-4 20 36-12 14 22m788 10 22-18-3-21 13 17 8-29 4 24 24-9-13 18 43-7" fill="#191d16" stroke="#151812" stroke-width="2"/>
+              <rect width="1000" height="390" fill="url(#ink-hatch)" opacity=".46"/>
+              <rect width="1000" height="390" fill="url(#paper-grain)"/>
+              <rect width="1000" height="390" fill="url(#scene-shade)"/>
+            </svg>
+            <canvas id="weather-canvas" class="weather-canvas" aria-hidden="true"></canvas>
+            <div class="scene-firelight" aria-hidden="true"></div>
+            <div id="scene-hotspots" class="scene-hotspots"></div>
+            <div id="action-echo" class="action-echo" aria-hidden="true"></div>
+            <div id="phase-banner" class="phase-banner" aria-hidden="true"></div>
+            <div class="location-heading"><div class="eyebrow"><span class="live-dot"></span>你在这里</div><h2 id="location-name">林间营地</h2><p id="location-subtitle">森林深处，尚有一处可以安心停留的地方。</p></div>
+            <span class="location-tag" id="location-tag"><svg class="icon"><use href="#i-leaf"/></svg>一隅安稳</span>
+            <div class="scene-bottom"><p id="scene-description">风穿过松林，余烬在灰白的木柴间轻轻呼吸。</p><span class="scene-coordinates" id="scene-coordinates">THE WOODLAND CAMP · 01</span></div>
+          </section>
+
+          <div class="fire-strip" id="fire-strip"></div>
+
+          <section class="activity-panel" aria-label="游戏行动">
+            <div class="section-heading"><h2 id="activity-title"><span class="heading-dash"></span>此刻，做些什么？</h2><span class="section-meta" id="activity-meta">行动才会推动时间 <svg class="icon"><use href="#i-clock"/></svg></span></div>
+            <div id="explore-view" class="view-panel"><div id="action-grid" class="action-grid"></div></div>
+            <div id="craft-view" class="view-panel" hidden><div id="craft-filters" class="filter-row" aria-label="制作类别"></div><div id="recipe-grid" class="recipe-grid"></div></div>
+            <div id="map-view" class="view-panel" hidden>
+              <div class="world-map" id="world-map">
+                <svg viewBox="0 0 800 320" preserveAspectRatio="none" aria-hidden="true" class="map-terrain"><path d="M64 150C76 58 186 62 227 32s94 23 145 13S497 7 549 28s42 64 112 60 99 62 74 100 20 80-63 95-114-37-177-1-111-13-170-2-67-18-105-4-136-7-124-56-36-33-32-70Z" fill="#303b2c" stroke="#657156" stroke-opacity=".4"/><path d="M86 156c19-70 106-71 153-100s123 36 164 14 126-24 157 23 128 7 149 60-9 102-78 103-100-10-139 8-124-19-159-6-112-24-159-16-91-29-88-86Z" fill="none" stroke="#7b8766" stroke-opacity=".12"/><path d="M355 179 214 80m141 99 214-93M355 179l-221 46m221-46 209 65m-209-65 321-11m-107-82 107 82m-112 76 112-76" fill="none" stroke="#b7af84" stroke-width="1.5" stroke-opacity=".25" stroke-dasharray="5 7"/><path d="M469 23c-50 78 54 63 13 122s13 89 1 150" fill="none" stroke="#769a8a" stroke-opacity=".2" stroke-width="12"/><g color="#829171" opacity=".25"><use href="#i-tree" x="290" y="60" width="26" height="31"/><use href="#i-tree" x="120" y="117" width="31" height="35"/><use href="#i-tree" x="254" y="139" width="23" height="30"/><use href="#i-tree" x="237" y="226" width="23" height="30"/><use href="#i-mountain" x="75" y="173" width="35" height="32"/><use href="#i-mountain" x="179" y="257" width="32" height="25"/><use href="#i-grass" x="619" y="97" width="28" height="29"/><use href="#i-grass" x="506" y="62" width="20" height="23"/><use href="#i-water" x="603" y="257" width="37" height="27"/></g><g transform="translate(738 36)" stroke="#a5a585" fill="none" opacity=".5"><path d="M0-12V12M-8 0H8m-8-12-3 8 3-2 3 2-3-8Z"/><text x="0" y="-18" fill="#a5a585" stroke="none" text-anchor="middle" font-size="10">N</text></g></svg>
+                <svg class="map-route" viewBox="0 0 800 320" preserveAspectRatio="none" aria-hidden="true"><path id="map-route-path"/></svg>
+                <div id="map-locations"></div>
+                <span class="map-caption">荒野，不止眼前所见。</span>
+              </div>
+              <div id="map-detail" class="map-detail"></div>
+            </div>
+          </section>
+
+          <section class="journal-panel" aria-label="荒野手记">
+            <div class="section-heading"><h2><svg class="icon"><use href="#i-book"/></svg>荒野手记<span class="small-tag">你的每一步，都有迹可循</span></h2><button class="text-button" data-command="journal" id="journal-toggle">展开记录 <svg class="icon"><use href="#i-chevron"/></svg></button></div>
+            <div class="journal-list" id="journal-list" role="log" aria-live="off"></div>
+          </section>
+        </div>
+
+        <aside class="side-column">
+          <section class="guide-card" aria-label="当前生存指引" id="guide-card"></section>
+          <section class="inventory-card" aria-label="随身行囊">
+            <div class="inventory-heading"><h2><svg class="icon"><use href="#i-bag"/></svg>随身行囊</h2><span id="inventory-count">8 种物品</span></div>
+            <div class="inventory-filters" id="inventory-filters" aria-label="行囊分类"></div>
+            <div id="inventory-grid" class="inventory-grid"></div>
+            <div id="item-detail" class="item-detail"></div>
+            <div class="inventory-foot"><svg class="icon"><use href="#i-compass"/></svg><span id="inventory-hint">轻装上路，把希望装进行囊。</span></div>
+          </section>
+          <div class="field-note"><svg class="icon"><use href="#i-leaf"/></svg><div><span>荒野小记 / <b id="tip-number">01</b></span><p id="field-tip">不要等到黑夜降临，才想起寻找木材。</p></div></div>
+        </aside>
+      </div>
+    </main>
+    <footer><span><span class="footer-ember">✦</span> 火还在，故事就还在。</span><span>余烬 · 文字生存 <i></i> <button class="text-button" data-command="help">写给初来者</button></span></footer>
+  </div>
+
+  <nav class="mobile-shortcuts" aria-label="快捷操作"><button data-command="actions"><svg class="icon"><use href="#i-compass"/></svg>行动</button><button data-command="bag"><svg class="icon"><use href="#i-bag"/></svg>行囊</button><button data-command="mobile-map"><svg class="icon"><use href="#i-map"/></svg>地图</button></nav>
+  <div class="toast-region" id="toast-region" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
+  <dialog id="game-dialog" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
+  <input type="file" id="import-file" accept=".json,application/json" hidden>
+  <noscript><div class="noscript-note">需要在浏览器中启用 JavaScript，才能开始这段旅程。</div></noscript>
+</body>
+</html>

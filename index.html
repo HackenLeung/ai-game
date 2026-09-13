@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <meta name="description" content="游间小游戏大厅：走进逸剑风云决的江湖，或在余烬荒野守住篝火。无需下载，即点即玩。">
+  <title>游间 · 给自己一点游玩的时间</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="hall/styles.css">
+  <script src="hall/catalog.js" defer></script>
+  <script src="hall/library.js" defer></script>
+  <script src="hall/ui.js" defer></script>
+  <script src="hall/app.js" defer></script>
+</head>
+<body>
+  <a href="#library" class="skip-link">跳到游戏列表</a>
+  <aside class="sidebar">
+    <a class="brand" href="index.html" aria-label="游间首页"><img src="favicon.svg" alt="" width="40" height="40"><span>游间<small>PLAY A LITTLE.</small></span></a>
+    <p class="nav-caption">你的游戏角落</p>
+    <nav class="main-nav" aria-label="大厅导航">
+      <a href="#discover" data-view="discover" class="nav-item active" aria-current="page"><span data-icon="grid"></span><span>发现游戏</span><span class="nav-count" id="all-count">2</span></a>
+      <a href="#favorites" data-view="favorites" class="nav-item"><span data-icon="heart"></span><span>我的收藏</span><span class="nav-count" id="favorite-count">0</span></a>
+      <a href="#recent" data-view="recent" class="nav-item"><span data-icon="clock"></span><span>最近游玩</span></a>
+    </nav>
+    <div class="sidebar-categories"><p class="nav-caption">探索不同世界</p><nav id="side-categories" aria-label="游戏类型"></nav></div>
+    <div class="sidebar-bottom"><div class="side-note"><span class="tiny-star">✳</span><p>小小的游戏，<br>刚刚好的快乐。</p><span>TAKE A LITTLE BREAK</span></div><button class="nav-item help-link" data-guide aria-label="游玩指南"><span data-icon="help"></span><span>游玩指南</span><span class="external-arrow">↗</span></button><div class="sidebar-foot"><span class="status-dot"></span>无需下载，随时开玩</div></div>
+  </aside>
+  <div class="main-shell">
+    <header class="topbar">
+      <div class="page-heading"><p class="eyebrow">YOUR LITTLE ESCAPE</p><h1 id="page-title">发现游戏<span class="heading-dot">.</span></h1></div>
+      <div class="topbar-actions"><div class="search-field"><span data-icon="search"></span><input id="search" type="search" placeholder="找一个想去的世界…" aria-label="搜索游戏" autocomplete="off"><button id="clear-search" class="search-clear" type="button" aria-label="清空搜索" hidden><span data-icon="close"></span></button><kbd id="search-shortcut" aria-hidden="true">/</kbd></div><button class="button random-button" id="random-play" aria-label="随便玩一个"><span data-icon="shuffle"></span><span>随便玩一个</span></button></div>
+    </header>
+    <main>
+      <section id="featured" class="featured jade" aria-label="精选游戏"></section>
+      <div class="welcome-strip" id="welcome-strip"><span><span data-icon="sun"></span>不用走很远，冒险就在这里。</span><span class="welcome-meta"><b id="catalog-count">02</b> 个小世界，等你来探索</span></div>
+      <div class="content-layout">
+        <section class="library-section" id="library" aria-labelledby="library-title">
+          <div class="section-heading"><div><h2 id="library-title">全部游戏</h2><span id="result-count" aria-live="polite">2 款游戏</span></div><div class="sort-field" id="sort-control">
+              <input id="sort" type="hidden" value="default">
+              <button class="sort-trigger" id="sort-trigger" type="button" aria-label="游戏排序：精选顺序" aria-haspopup="listbox" aria-expanded="false" aria-controls="sort-menu"><span id="sort-label">精选顺序</span><span data-icon="chevron"></span></button>
+              <div class="sort-menu" id="sort-menu" role="listbox" aria-label="游戏排序" hidden>
+                <button class="sort-option" type="button" role="option" data-sort="default" tabindex="-1" aria-selected="true"><span>精选顺序</span><span data-icon="check"></span></button>
+                <button class="sort-option" type="button" role="option" data-sort="recent" tabindex="-1" aria-selected="false"><span>最近玩过</span><span data-icon="check"></span></button>
+                <button class="sort-option" type="button" role="option" data-sort="name" tabindex="-1" aria-selected="false"><span>按名称</span><span data-icon="check"></span></button>
+              </div>
+            </div></div>
+          <div id="category-filters" class="category-filters" role="group" aria-label="筛选游戏分类"></div>
+          <div id="game-grid" class="game-grid"></div>
+          <div id="empty-state" class="empty-state" hidden><span data-icon="search"></span><h3 id="empty-title">没有找到相关游戏</h3><p id="empty-description">换个关键词，或者看看其他小世界。</p><button id="reset-filters" class="button secondary">看看全部游戏<span data-icon="arrow"></span></button></div>
+        </section>
+        <aside class="discovery-aside" aria-label="游玩记录与提示">
+          <section class="recent-panel"><div class="aside-heading"><h2>接着上次的冒险</h2><span data-icon="clock"></span></div><div id="recent-content"></div></section>
+          <section class="note-panel"><span class="note-icon" data-icon="book"></span><p class="eyebrow">A LITTLE REMINDER</p><h2>进度留在这里，<br>冒险随时继续。</h2><p>游戏会在当前浏览器保存进度。换个设备前，记得在游戏内导出存档。</p><button class="text-button" data-guide>了解存档与游玩<span data-icon="arrow"></span></button></section>
+        </aside>
+      </div>
+      <footer class="site-footer"><span><span class="footer-mark" data-icon="gamepad"></span>游间<span class="footer-separator">/</span>一个入口，许多个小世界。</span><span>MADE FOR A LITTLE JOY <span class="footer-spark">✳</span></span></footer>
+    </main>
+  </div>
+  <dialog id="info-dialog" class="info-dialog" aria-labelledby="dialog-title"><button class="dialog-close icon-button" data-dismiss aria-label="关闭详情"><span data-icon="close"></span></button><div id="dialog-content"></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript><div class="noscript-note">请开启 JavaScript 以使用游戏大厅。也可直接打开 <a href="games/fengyunjue/index.html">逸剑风云决</a> 或 <a href="games/jihuan/index.html">余烬</a>。</div></noscript>
+</body>
+</html>

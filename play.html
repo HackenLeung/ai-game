@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14251f">
+  <title>开始游玩 · 游间</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="hall/styles.css">
+  <script src="hall/catalog.js" defer></script>
+  <script src="hall/library.js" defer></script>
+  <script src="hall/ui.js" defer></script>
+  <script src="hall/player.js" defer></script>
+</head>
+<body class="player-page">
+  <div class="player-shell" id="player-shell">
+    <header class="player-toolbar"><a class="player-back" href="index.html"><img src="favicon.svg" alt=""><span data-icon="back"></span>返回大厅</a><div class="player-title"><span id="player-title">准备出发</span><small id="player-subtitle"></small></div><div class="player-tools"><button class="tool-button" id="player-help" aria-label="查看游戏操作说明" disabled><span data-icon="help"></span><span class="tool-label">操作说明</span></button><button class="tool-button" id="fullscreen" aria-label="进入全屏" aria-pressed="false"><span data-icon="fullscreen"></span><span class="tool-label">全屏游玩</span></button></div></header>
+    <main class="player-stage"><iframe id="game-frame" class="game-frame" title="游戏画面" allow="fullscreen; autoplay" allowfullscreen hidden></iframe><div class="player-state" id="player-state" role="status"><span class="loading-symbol" data-icon="gamepad"></span><h1>正在走进小世界</h1><p>冒险马上开始。</p></div></main>
+  </div>
+  <dialog id="info-dialog" class="info-dialog" aria-labelledby="dialog-title"><button class="dialog-close icon-button" data-dismiss aria-label="关闭详情"><span data-icon="close"></span></button><div id="dialog-content"></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <noscript><div class="noscript-note">请开启 JavaScript 后进入游戏，或先<a href="index.html">返回大厅</a>。</div></noscript>
+</body>
+</html>

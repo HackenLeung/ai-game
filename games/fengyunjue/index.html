@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d1917">
+  <meta name="description" content="可离线游玩的像素武侠江湖。三章、九地、49 段主线，护镖破阵、流派修行、九道悬赏与十二层剑冢。">
+  <title>逸剑风云决 · 问剑长歌</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231c3430'/%3E%3Cpath d='M44 9 23 36l5 5L51 16ZM17 34l16 14M23 41l-9 12' stroke='%23d8bd83' stroke-width='4' fill='none'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css?v=4.2">
+  <script src="expansion.js?v=4.0" defer></script>
+  <script src="story.js?v=4.0" defer></script>
+  <script src="combat.js?v=4.0" defer></script>
+  <script src="rules.js?v=4.0" defer></script>
+  <script src="feedback.js?v=4.3" defer></script>
+  <script src="audio.js?v=4.3" defer></script>
+  <script src="game.js?v=4.3" defer></script>
+</head>
+<body>
+  <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-sword" viewBox="0 0 24 24"><path d="m14.5 4 5.5-1-1 5.5L9 18l-3-3ZM4 13l7 7M7.5 17.5 3 22M3 20l1 1"/></symbol>
+    <symbol id="i-mountain" viewBox="0 0 24 24"><path d="m2 19 7-13 4 7 3-5 6 11ZM6.8 10l2.2 2 2.2-2M15 4h.01"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="m8 3 4 2 4-2-2 6c5 3 7 6 5 10-2 3-12 3-14 0-2-4 0-7 5-10ZM8 9h8M9 14l6 4M15 14l-6 4"/></symbol>
+    <symbol id="i-scroll" viewBox="0 0 24 24"><path d="M6 3h13v15H8M6 3a2 2 0 0 0-2 2v14a2 2 0 0 0 4 0V5a2 2 0 0 0-2-2ZM8 18h13v1a2 2 0 0 1-2 2H6M11 7h5M11 11h5"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m16 8-2 6-6 2 2-6ZM12 1v2M12 21v2M1 12h2M21 12h2"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4ZM17 8c3 2 3 6 0 8m3-11c5 4 5 10 0 14"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4ZM17 9l5 6m0-6-5 6"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M4 3h13l4 4v14H3V3ZM8 3v6h8V3M7 21v-8h10v8"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M20 3C9 2 2 7 5 16c7 5 17 0 15-13ZM3 21 16 8M8 16l-1-5M12 12h5"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21 3 12C-3 4 8 0 12 7c4-7 15-3 9 5ZM3 12h5l2-4 4 8 2-4h5"/></symbol>
+    <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h13a3 3 0 1 0-3-3M2 12h18a3 3 0 1 1-3 3M3 16h6a3 3 0 1 1-3 3"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 2 8 3v7c0 5-8 10-8 10S4 17 4 12V5ZM8 12l3 3 5-6"/></symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6c-8 4-8 12 2 12s10-8 2-12V3M6 14h12M10 17h4"/></symbol>
+    <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9h6v6H9Z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M19 10c0 6-7 12-7 12S5 16 5 10a7 7 0 0 1 14 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 8a3 3 0 0 1 6 0c0 2-3 2-3 5M12 17h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+  </svg>
+
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="逸剑风云决，回到江湖" data-panel="world">
+      <span class="brand-mark"><svg><use href="#i-sword"/></svg></span>
+      <span class="brand-name">逸剑风云决<span>THE WANDERING SWORD</span></span>
+      <span class="seal">江湖</span>
+    </a>
+    <nav class="main-nav" aria-label="游戏导航">
+      <button class="nav-button active" data-panel="world"><svg><use href="#i-mountain"/></svg><span>行走江湖</span></button>
+      <button class="nav-button" data-panel="skills"><svg><use href="#i-sword"/></svg><span>修行</span><kbd>K</kbd></button>
+      <button class="nav-button" data-panel="bag"><svg><use href="#i-bag"/></svg><span>行囊</span><kbd>B</kbd></button>
+      <button class="nav-button" data-panel="journal"><svg><use href="#i-scroll"/></svg><span>江湖志</span><kbd>J</kbd></button>
+      <button class="nav-button" data-panel="arena"><svg><use href="#i-compass"/></svg><span>历练</span><kbd>T</kbd></button>
+    </nav>
+    <div class="header-actions">
+      <button id="sound-toggle" class="icon-button" data-tooltip="开启音乐与音效" aria-label="开启音乐与音效" aria-pressed="false"><svg><use href="#i-mute"/></svg></button>
+      <button id="save-button" class="save-button"><svg><use href="#i-save"/></svg><span>存档</span></button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <section class="chapter-bar" aria-label="当前章节">
+      <div class="chapter-title"><span class="chapter-number" id="chapter-number">壹</span><div><button class="eyebrow chapter-link" id="chapter-eyebrow" data-panel="chapters">第一章 / 共三章</button><h1><span id="chapter-name" class="chapter-name-text">山水初逢</span><span id="chapter-subtitle">一封旧信，一次为他人拔剑。</span></h1></div></div>
+      <div class="world-time"><svg><use href="#i-sun"/></svg><span>初秋 · 未时</span><i></i><button data-panel="chapters">三章行迹 ↗</button></div>
+    </section>
+
+    <div class="game-layout">
+      <section class="adventure-column" aria-label="江湖场景">
+        <div class="stage-shell" id="stage-shell">
+          <canvas id="world" width="1280" height="760" tabindex="0" role="application" aria-label="江湖地图。使用 WASD 或方向键移动，E 交互。也可以点击地点或使用右侧任务指路。"></canvas>
+          <div class="scene-vignette"></div>
+          <div class="location-heading"><span class="eyebrow" id="location-region">江南道 · 世外小村</span><h2 id="location-name">梧桐村</h2><p id="location-poem">竹影摇风，炊烟待故人。</p></div>
+          <div class="scene-status" id="scene-status"><span></span>安全区域</div>
+          <button class="map-button" data-panel="map"><svg><use href="#i-compass"/></svg><span>江湖舆图</span><kbd>M</kbd></button>
+          <div class="battle-banner" id="battle-banner" hidden></div>
+          <div class="scene-message" id="scene-message" hidden></div>
+          <div id="scene-feedback" class="scene-feedback" role="status" aria-live="polite" hidden></div>
+          <button class="interact-prompt" id="interact-prompt" hidden><kbd>E</kbd><span>交谈</span><svg><use href="#i-arrow"/></svg></button>
+          <div class="scene-bottom"><span class="ambient-label"><span class="live-dot"></span><span id="ambient-text">风过竹林 · 鸟鸣山涧</span></span><span class="zoom-label">点击地面行走 · 点击人物交谈</span></div>
+          <div class="touch-pad" aria-label="方向控制"><button data-move="-1,-1" aria-label="向上移动">↑</button><button data-move="-1,1" aria-label="向左移动">←</button><button data-move="1,1" aria-label="向下移动">↓</button><button data-move="1,-1" aria-label="向右移动">→</button></div>
+        </div>
+
+        <div class="action-dock">
+          <div class="stance"><span class="stance-emblem"><svg><use href="#i-sword"/></svg></span><div><strong id="stance-title">剑心初醒</strong><span id="stance-subtitle">心有所向，剑有所往</span></div></div>
+          <div class="skill-hotbar" aria-label="快捷招式">
+            <button class="hotkey active" data-skill="strike" data-tooltip="流云剑法：攻击两格内的敌人"><kbd>1</kbd><svg><use href="#i-sword"/></svg><span>流云剑法</span></button>
+            <button class="hotkey" data-skill="sweep" data-tooltip="清风掠影：消耗 18 真气，攻击目标及相邻敌人"><kbd>2</kbd><svg><use href="#i-wind"/></svg><span>清风掠影</span></button>
+            <button class="hotkey" data-skill="heal" data-tooltip="凝神归元：消耗 22 真气，恢复气血并清去一层毒"><kbd>3</kbd><svg><use href="#i-leaf"/></svg><span>凝神归元</span></button>
+            <span class="hotbar-divider"></span>
+            <button class="hotkey medicine" data-skill="potion" data-tooltip="使用金疮药，恢复 60 气血"><kbd>4</kbd><svg><use href="#i-flask"/></svg><span>金疮药 <small id="potion-count">2</small></span></button>
+            <button class="hotkey" data-skill="guard" data-tooltip="战斗中防御并恢复真气；探索时打开操作说明"><kbd>5</kbd><svg><use href="#i-shield"/></svg><span id="guard-label">凝神守势</span></button>
+            <button class="hotkey ultimate" data-skill="ultimate" data-tooltip="通过第三章武当试剑后习得"><kbd>6</kbd><svg><use href="#i-sword"/></svg><span id="ultimate-label">剑归沧海</span></button>
+            <button class="hotkey" data-skill="pierce" data-tooltip="破岳剑：16 真气，破盾与打断蓄力"><kbd>7</kbd><svg><use href="#i-sword"/></svg><span>破岳剑</span></button>
+            <button class="hotkey" data-skill="poison" data-tooltip="飞花毒刃：14 真气，施加持续毒伤"><kbd>8</kbd><svg><use href="#i-leaf"/></svg><span>飞花毒刃</span></button>
+            <button class="hotkey" data-skill="aid" data-tooltip="援救：18 真气，恢复三格内护送目标的气血"><kbd>9</kbd><svg><use href="#i-heart"/></svg><span>援救友方</span></button>
+            <button class="hotkey" data-skill="move" data-tooltip="移步模式：点击亮起的空格移动，可避开人物遮挡"><kbd>0</kbd><svg><use href="#i-compass"/></svg><span>移步</span></button>
+          </div>
+        </div>
+        <div class="travel-log"><span class="log-label">江湖闻记</span><p id="latest-log" aria-live="polite">你循着一封旧信来到梧桐村。去找柳伯，问一问信中往事吧。</p><span class="log-decoration">◆</span></div>
+      </section>
+
+      <aside class="sidebar" aria-label="侠客与任务">
+        <section class="panel character-panel">
+          <div class="panel-heading"><span>侠客</span><span class="little-flower">✦</span></div>
+          <div class="character-identity">
+            <div class="portrait-frame"><canvas id="portrait" width="96" height="110" aria-label="宇文逸的像素头像"></canvas><span id="level-badge">壹</span></div>
+            <div class="character-name"><span class="eyebrow">无门无派 · 少年游</span><h2>宇文逸</h2><span class="rank" id="rank">初出茅庐</span></div>
+          </div>
+          <div class="stat"><div><span><i class="stat-dot health"></i>气血</span><span id="hp-value">120 <small>/ 120</small></span></div><div class="meter"><span class="health" id="hp-bar"></span></div></div>
+          <div class="stat"><div><span><i class="stat-dot qi"></i>真气</span><span id="mp-value">60 <small>/ 60</small></span></div><div class="meter"><span class="qi" id="mp-bar"></span></div></div>
+          <div class="character-footer"><span><svg><use href="#i-coin"/></svg><strong id="gold-value">128</strong><small>铜钱</small></span><span>境界 <strong id="level-value">一重</strong></span></div>
+          <button class="party-shortcut" data-panel="party"><svg><use href="#i-wind"/></svg><span id="companion-name">独行江湖</span><small id="xp-value">修为 0 / 70</small><svg><use href="#i-arrow"/></svg></button>
+          <button class="build-shortcut" data-panel="skills"><span id="build-summary">中正 · 险境</span><span>调整修行 ↗</span></button>
+          <div class="battle-resources" id="battle-resources" hidden></div>
+        </section>
+
+        <section class="panel quest-panel">
+          <div class="panel-heading"><span>当前指引</span><span class="tag" id="quest-chapter">一章 · 主线</span></div>
+          <div class="quest-heading"><span class="quest-symbol">!</span><h3 id="quest-title">一封旧信</h3></div>
+          <p class="quest-description" id="quest-description">故人留信，引你来到这座江南小村。村中的柳伯，或许知道你的身世。</p>
+          <div class="quest-objective"><span id="objective-marker"></span><span id="quest-objective">与村长柳伯交谈</span><small id="quest-count">0 / 1</small></div>
+          <div class="quest-rewards" id="quest-rewards"><span>任务奖励</span><span><svg><use href="#i-coin"/></svg>30</span><span><svg><use href="#i-scroll"/></svg>20 修为</span></div>
+          <button class="primary-button guide-button" id="quest-guide"><svg><use href="#i-pin"/></svg><span>前往柳伯</span><svg class="arrow"><use href="#i-arrow"/></svg></button>
+          <div class="quest-progress" id="quest-progress" aria-label="第一章进度"></div>
+        </section>
+
+        <section class="panel surroundings-panel">
+          <div class="panel-heading"><span>此间江湖</span><span class="location-small" id="nearby-region">梧桐村</span></div>
+          <div id="nearby-list" class="nearby-list"></div>
+          <div class="world-note"><svg><use href="#i-leaf"/></svg><span id="world-note">闲来无事，也可在溪边垂钓。</span></div>
+        </section>
+      </aside>
+    </div>
+
+    <footer class="app-footer"><span><i class="save-dot"></i><span id="save-status">问剑长歌 · 江湖行迹自动保存</span></span><span class="footer-poem">浮生一剑，且听风吟。</span><button data-panel="help"><svg><use href="#i-help"/></svg>游玩指南 <kbd>?</kbd></button></footer>
+  </main>
+
+  <dialog id="modal" aria-labelledby="modal-title"><div class="modal-shell"><header class="modal-header"><div><span class="eyebrow" id="modal-eyebrow">江湖百事</span><h2 id="modal-title" tabindex="-1" autofocus></h2></div><button id="modal-close" class="icon-button" aria-label="关闭弹窗"><svg><use href="#i-close"/></svg></button></header><div id="modal-body"></div></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" popover="manual"></div>
+  <div id="game-tooltip" class="game-tooltip" role="tooltip" popover="manual" hidden></div>
+  <div id="action-feedback" class="action-feedback" role="status" aria-live="polite" popover="manual" hidden></div>
+  <noscript><div class="no-script">请启用浏览器的 JavaScript，开始这段江湖旅程。</div></noscript>
+</body>
+</html>

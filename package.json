@@ -1,0 +1,16 @@
+{
+  "name": "youjian-game-hall",
+  "version": "1.0.0",
+  "private": true,
+  "description": "游间：一个入口，走进不同的小世界。小游戏合集与游戏大厅。",
+  "scripts": {
+    "start": "node scripts/serve.cjs",
+    "dev": "node scripts/serve.cjs",
+    "build": "node scripts/build.cjs",
+    "preview": "node scripts/serve.cjs --dist",
+    "test": "node scripts/test.cjs",
+    "test:browser": "node scripts/browser-smoke.cjs",
+    "test:browser:dist": "node scripts/browser-smoke.cjs --dist"
+  },
+  "engines": { "node": ">=18" }
+}
