@@ -42,13 +42,13 @@
   }
   function showDetails(game, playing = false) {
     show(`<div class="detail-cover ${escape(game.color)}"><img src="${escape(game.cover)}" alt="${escape(game.scene)}"><span class="detail-badge">${icon(game.icon)}${escape(game.categoryLabel)}</span></div>
-      <div class="detail-body"><p class="eyebrow">${escape(game.english)}</p><h2 id="dialog-title">${escape(game.title)}<span>${escape(game.subtitle)}</span></h2><p class="detail-intro">${escape(game.description)}</p>
+      <div class="detail-body"><p class="eyebrow">${escape(game.english)}</p><div class="detail-title-row"><h2 id="dialog-title">${escape(game.title)}<span>${escape(game.subtitle)}</span></h2>${playing ? `<button class="button primary" data-dismiss>${icon('play')}返回游戏</button>` : `<a class="button primary" href="${playUrl(game.id)}">${icon('play')}开始游戏</a>`}</div><p class="detail-intro">${escape(game.description)}</p>
       <div class="detail-facts">${game.facts.map(([number, label]) => `<div><strong>${escape(number)}</strong><span>${escape(label)}</span></div>`).join('')}</div>
       <h3>这个世界里，有些什么？</h3><ul class="highlight-list">${game.highlights.map(text => `<li>${icon('check')}<span>${escape(text)}</span></li>`).join('')}</ul>
       <h3>上手指南</h3><p class="detail-tip">${escape(game.tip)}</p><dl class="controls-list">${game.controls.map(([key, action]) => `<div><dt><kbd>${escape(key)}</kbd></dt><dd>${escape(action)}</dd></div>`).join('')}</dl>
       <div class="save-note">${icon('book')}<p>${escape(game.saveHelp)}<br>进度保存在当前浏览器；更换地址或设备前，请先导出存档。</p></div>
       <details class="screenshot-disclosure"><summary>${icon('monitor')}<span>看看完整游戏画面</span>${icon('chevron')}</summary><img src="${escape(game.screenshot)}" alt="${escape(game.title)}的完整游戏界面" loading="lazy"></details>
-      <div class="detail-action">${playing ? `<button class="button primary" data-dismiss>${icon('play')}返回游戏</button>` : `<a class="button primary" href="${playUrl(game.id)}">${icon('play')}开始游玩</a>`}<span>无需下载 · 支持键鼠与触屏</span></div></div>`);
+      <div class="detail-action"><span>无需下载 · 支持键鼠与触屏</span></div></div>`);
   }
   function showGuide() {
     show(`<div class="guide-body"><span class="guide-emblem">${icon('leaf')}</span><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="dialog-title">随时出发，也随时回来。</h2><p class="detail-intro">挑一个喜欢的小世界，点击「开始游玩」就能进入。收藏喜欢的游戏，下次在大厅里更快找到它。</p><h3>我的进度会保存吗？</h3><p>两款游戏都有本地存档。使用同一个浏览器、同一个地址打开，就能读取原有进度。隐私窗口和清理站点数据可能让存档消失。</p><h3>怎样带上原来的存档？</h3><ol><li>先打开原来的游戏，在游戏内导出存档文件。</li><li>从这个大厅进入对应游戏，再导入刚才的存档。</li></ol><p>逸剑风云决：打开「游玩指南」。<br>余烬：打开右上角「存档与设置」。</p><h3>可以在手机上玩吗？</h3><p>可以。两款游戏都提供触屏操作。游玩时可以通过顶部按钮查看操作说明，或尝试全屏模式。</p><div class="detail-action"><button class="button primary" data-dismiss>去挑一个游戏${icon('arrow')}</button></div></div>`);

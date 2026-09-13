@@ -15,7 +15,7 @@ async function captureBattle(page){const snap=await page.evaluate(()=>{const {s,
 async function move(page,pos){
   await page.keyboard.press('0');await page.locator('#world').scrollIntoViewIfNeeded();
   const point=await page.locator('#world').evaluate((canvas,{x,y})=>{
-    const box=canvas.getBoundingClientRect(),ratio=Math.max(1,(box.height/760)/(box.width/1280)),zoom=ratio>1.35?Math.min(1,1.52/ratio):1;
+    const box=canvas.getBoundingClientRect(),ratio=(box.height/760)/(box.width/1280),zoom=ratio>1.35?Math.min(1,1.52/ratio):1;
     return{x:box.left+(640+(x-y)*54*ratio*zoom)/1280*box.width,y:box.top+((210+(x+y)*28-380)*zoom+380)/760*box.height};
   },pos);await page.mouse.click(point.x,point.y);
   await page.waitForFunction(({x,y})=>window.__combat.b.player.x===x&&window.__combat.b.player.y===y,pos);

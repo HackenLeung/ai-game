@@ -243,6 +243,7 @@
   }
 
   function renderView() {
+    document.body.dataset.view = view;
     for (const id of ['explore', 'craft', 'map']) $(`#${id}-view`).hidden = id !== view;
     document.querySelectorAll('.nav-button').forEach(button => {
       const selected = button.dataset.view === view;

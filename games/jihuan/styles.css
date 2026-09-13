@@ -729,6 +729,135 @@ dialog .primary-button:focus-visible { outline-color: #6d421d; }
   footer { flex-direction: column; gap: 13px; margin-top: 25px; }
 }
 
+
+/* Keep the desktop's everyday actions inside the available game viewport. */
+@media (min-width: 1000px) {
+  html { scrollbar-gutter: auto; }
+  .app-shell { max-width: 1760px; height: 100dvh; min-height: 660px; padding: 0 clamp(20px, 2.5vw, 44px) 12px; display: flex; flex-direction: column; }
+  .site-header { flex: 0 0 56px; height: 56px; gap: 18px; }
+  .brand-mark { width: 30px; height: 36px; }
+  .brand-mark .icon { width: 27px; height: 32px; }
+  .brand-name { font-size: 29px; letter-spacing: 3px; }
+  .brand-en { font-size: 7px; margin-top: 3px; }
+  .brand-divider { height: 27px; margin: 0 8px; }
+  .brand-subtitle { font-size: 15px; }
+  .brand-subtitle small { font-size: 9px; }
+  .main-nav { gap: 8px; }
+  .nav-button { min-width: 84px; height: 38px; font-size: 17px; padding: 6px 13px; }
+  .header-tools { gap: 7px; }
+  .header-tools .icon-button { width: 34px; height: 34px; }
+  .app-shell > main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .day-heading { flex: 0 0 auto; gap: 20px; padding: 10px 0 8px; }
+  .intro .eyebrow { display: none; }
+  .intro h1 { margin: 0; font-size: 24px; }
+  .intro p { margin-top: 3px; max-width: none; font-size: 11px; }
+  .day-clock { width: 390px; padding: 7px 12px; transform: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 18px; }
+  .day-clock-top { grid-column: 2; grid-row: 1; gap: 12px; align-self: center; }
+  .day-clock-main { grid-column: 1; grid-row: 1; margin: 0; gap: 10px; }
+  .day-clock-main b { font-size: 24px; }
+  #game-time { font-size: 22px; }
+  .day-track { grid-column: 1 / -1; }
+  .day-track-labels { grid-column: 1 / -1; margin-top: 0; font-size: 9px; }
+  .status-grid { flex: 0 0 auto; gap: 14px; padding: 0 0 12px; }
+  .stat-card { gap: 10px; padding: 4px 9px 6px; }
+  .stat-icon { width: 36px; height: 38px; border-width: 2px; }
+  .stat-icon .icon { width: 23px; height: 23px; }
+  .stat-name { font-size: 15px; }
+  .stat-value b { font-size: 23px; }
+  .stat-track { margin-top: 5px; }
+  .stat-label { display: none; }
+  .game-layout { flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) clamp(288px, 25vw, 340px); align-items: stretch; gap: 18px; }
+  .main-column, .side-column { min-height: 0; display: flex; flex-direction: column; }
+  .landscape-card { flex: 1; height: auto; min-height: 160px; }
+  .landscape { inset: auto 0 0; width: 100%; height: auto; min-height: 100%; aspect-ratio: 1000 / 390; }
+  .location-heading { left: 20px; top: 14px; }
+  .location-heading .eyebrow { font-size: 9px; letter-spacing: 2px; }
+  .location-heading h2 { font-size: 29px; margin-top: 3px; }
+  .location-heading p { font-size: 11px; margin-top: 4px; }
+  .location-tag { top: 17px; right: 18px; font-size: 12px; }
+  .scene-bottom { left: 20px; right: 18px; bottom: 12px; }
+  .scene-bottom p { font-size: 13px; line-height: 1.6; max-width: 75%; }
+  .scene-coordinates { font-size: 7px; }
+  .fire-strip { flex: 0 0 auto; min-height: 44px; padding: 6px 12px; gap: 10px; }
+  .fire-strip > .icon { width: 23px; height: 26px; }
+  .fire-title { font-size: 15px; }
+  .fire-title span { font-size: 10px; margin-left: 8px; }
+  .fire-track { margin-top: 4px; height: 3px; }
+  .fire-description { display: none; }
+  .fire-strip .small-button { min-height: 32px; padding: 5px 9px; }
+  .activity-panel { flex: 0 0 auto; min-height: 0; display: flex; flex-direction: column; margin-top: 10px; }
+  .activity-panel > .section-heading { flex: 0 0 auto; margin: 0 0 8px; }
+  .section-heading h2 { font-size: 19px; }
+  .action-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .action-card { display: block; padding: 10px; }
+  .action-icon { display: none; }
+  .action-title { flex-wrap: wrap; margin-bottom: 4px; gap: 3px 7px; }
+  .action-title strong { font-size: 18px; }
+  .action-description { min-height: 0; font-size: 11px; line-height: 1.6; }
+  .action-bottom { margin-top: 6px; padding-top: 6px; gap: 4px; }
+  .action-reward { font-size: 11px; line-height: 1.5; }
+  .action-shortcut .icon { display: none; }
+  .journal-panel { flex: 0 0 76px; min-height: 0; margin-top: 10px; padding: 6px 12px; display: flex; flex-direction: column; clip-path: none; border: 1px solid #8c744f77; border-radius: 3px; }
+  .journal-panel::before, .journal-entry::after { display: none; }
+  .journal-panel .section-heading { flex: 0 0 auto; min-height: 23px; margin: 0; padding: 0; border: 0; }
+  .journal-panel .section-heading h2 { font-size: 16px; }
+  .journal-panel .small-tag { display: none; }
+  .journal-list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; --scrollbar-thumb: #988057; --scrollbar-hover: #725934; }
+  .journal-entry { grid-template-columns: 50px minmax(0, 1fr); gap: 12px; padding: 5px 0; }
+  .journal-entry time { font-size: 10px; line-height: 1.5; }
+  .journal-content { padding: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 10px; }
+  .journal-content h3 { margin: 0; font-size: 14px; }
+  .journal-content p { font-size: 13px; line-height: 1.5; }
+  .side-column { gap: 12px; }
+  .guide-card { flex: 0 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; padding: 12px; transform: none; }
+  .guide-card::before { display: none; }
+  .guide-eyebrow, .guide-description, .guide-steps { grid-column: 1 / -1; }
+  .guide-card h2 { grid-column: 1; grid-row: 2; margin: 0; font-size: 20px; align-self: center; transform: none; }
+  .guide-description { margin: 0; font-size: 11px; }
+  .guide-steps { display: flex; flex-direction: row; flex-wrap: wrap; margin: 0; gap: 4px 12px; }
+  .guide-steps li { gap: 6px; }
+  .guide-steps button { font-size: 11px; line-height: 1.6; }
+  .step-check { width: 13px; height: 14px; }
+  .guide-button { grid-column: 2; grid-row: 2; align-self: center; width: auto; min-height: 34px; padding: 6px 8px; gap: 6px; font-size: 13px; }
+  .guide-button .icon { width: 14px; height: 14px; }
+  .inventory-card { flex: 1; min-height: 0; margin: 0; display: flex; flex-direction: column; }
+  .inventory-heading { flex: 0 0 auto; padding: 9px 11px 6px; }
+  .inventory-heading h2 { font-size: 20px; }
+  .inventory-heading .icon { width: 18px; height: 18px; }
+  .inventory-filters { flex: 0 0 auto; padding: 0 10px; }
+  .inventory-filters > button { min-height: 33px; padding: 5px 2px; font-size: 15px; }
+  .inventory-grid { flex: 1; min-height: 0; padding: 9px; gap: 6px; align-content: start; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+  .inventory-item { height: 59px; gap: 3px; padding: 5px 3px; }
+  .inventory-item > .icon { width: 25px; height: 25px; }
+  .inventory-item > span { font-size: 12px; }
+  .inventory-item > b { font-size: 11px; }
+  .inventory-empty-slot { display: none; }
+  .item-detail { flex: 0 0 auto; min-height: 0; padding: 8px 11px; }
+  .item-detail h3 { font-size: 18px; }
+  .item-detail p { margin-top: 5px; font-size: 11px; line-height: 1.65; }
+  .item-detail .small-button { min-height: 32px; font-size: 11px; padding: 5px 8px; }
+  .inventory-foot { flex: 0 0 auto; padding: 5px 10px; font-size: 9px; }
+  .field-note, .app-shell > footer { display: none; }
+  body:not([data-view="explore"]) .landscape-card { display: none; }
+  body:not([data-view="explore"]) .activity-panel { flex: 1; }
+  .view-panel:not([hidden]) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .filter-row { flex: 0 0 auto; margin: 0 0 8px; padding-bottom: 7px; }
+  .filter-button { min-height: 34px; padding: 5px 13px; font-size: 16px; }
+  .recipe-grid { flex: 1; min-height: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 10px; padding: 2px 4px 5px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+  .recipe-card { padding: 14px; }
+  .recipe-head h3 { font-size: 21px; }
+  .recipe-card > p { margin: 8px 0 10px; }
+  .recipe-costs { margin-bottom: 10px; }
+  .recipe-footer { padding-top: 9px; }
+  .recipe-footer .small-button { min-height: 34px; }
+  #map-view { overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+  .world-map { flex: 1; min-height: 160px; height: auto; }
+  .map-detail { flex: 0 0 auto; padding: 11px 14px; gap: 12px; }
+  .map-detail p { margin-top: 4px; }
+  .map-detail .small-button { min-height: 36px; }
+  .journal-list:focus-visible, .inventory-grid:focus-visible, .recipe-grid:focus-visible, #map-view:focus-visible { outline: 2px solid #cba569; outline-offset: -3px; }
+}
+
 body.effects-off *, body.effects-off *::before, body.effects-off *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 body.effects-off .danger-vignette { display: none; }
 @media (prefers-reduced-motion: reduce) {

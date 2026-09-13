@@ -32,7 +32,7 @@ if (typeof document !== 'undefined') (() => {
   const FX=createJianghuFeedback({scene:$('scene-feedback'),notice:$('action-feedback'),reducedMotion:()=>reduceMotion});
   const audio=createJianghuAudio({onChange:renderSoundToggle,onError:()=>toast('声音暂时未能开启，请再点击右上角声音按钮。')});
   const view={scaleX:1,scaleY:1,cameraX:640};
-  let viewportRatio=1;
+  let viewportRatio=1, canvasDisplayScale=1;
   const STORY = R.STORY, QUESTS = STORY.quests, SITES = STORY.sites;
   const LOCATIONS = STORY.locations;
   const MAPS = {};
@@ -834,6 +834,9 @@ if (typeof document !== 'undefined') (() => {
       const x=hash(i,4)*W,y=hash(i,8)*H;
       if(y>240)rect(g,x,y,6+hash(i,9)*27,1,['#71988840','#a7bb9740','#456f6055'][i%3]);
     }
+    // Paint the landscape separately so wide views can keep the island in proportion.
+    const backdrop=document.createElement('canvas');backdrop.width=W;backdrop.height=H;
+    backdrop.getContext('2d').drawImage(layer,0,0);g.clearRect(0,0,W,H);
     // A shallow stone escarpment gives the island its miniature, raised silhouette.
     const left=iso(0,24),bottom=iso(24,24),right=iso(24,0);
     poly(g,[[left.x-24,left.y],[bottom.x,bottom.y+12],[bottom.x,bottom.y+55],[left.x-24,left.y+40]],'#586451');
@@ -932,7 +935,7 @@ if (typeof document !== 'undefined') (() => {
         while(x!==site.x||y!==site.y){if(x!==site.x)x+=Math.sign(site.x-x);else y+=Math.sign(site.y-y);blocked.delete(R.key(x,y));const o=objects.findIndex(o=>o.x===x&&o.y===y&&['pine','tree','maple','bamboo','stone','reeds'].includes(o.type));if(o>=0)objects.splice(o,1);}
       }
     }
-    return {layer,blocked,objects};
+    return {layer,backdrop,blocked,objects};
   }
   function drawObject(g,o) {
     if(o.type==='reeds'){const p=iso(o.x,o.y);for(let i=0;i<8;i++){const x=p.x+(i-4)*4,h=24+hash(i,o.x+o.y)*25;rect(g,x,p.y-h,2,h,'#667d57');rect(g,x-1,p.y-h-9,4,12,'#c8bd8a');}}
@@ -1030,8 +1033,9 @@ if (typeof document !== 'undefined') (() => {
     return spriteCache.get(id);
   }
   function label(g,x,y,text,color='#e9e6c8',small=false) {
-    g.font=`${viewportRatio>1.35?(small?17:19):(small?13:16)}px "Microsoft YaHei", sans-serif`;g.textAlign='center';g.textBaseline='middle';
-    const width=g.measureText(text).width+16;g.fillStyle='rgba(25,47,33,.83)';g.beginPath();g.roundRect(x-width/2,y-12,width,24,4);g.fill();
+    const fontSize=Math.max(small?13:16,(small?11:12)/(canvasDisplayScale*view.scaleY));
+    g.font=`${fontSize}px "Microsoft YaHei", sans-serif`;g.textAlign='center';g.textBaseline='middle';
+    const width=g.measureText(text).width+16,height=fontSize+8;g.fillStyle='rgba(25,47,33,.83)';g.beginPath();g.roundRect(x-width/2,y-height/2,width,height,4);g.fill();
     g.strokeStyle='rgba(175,189,133,.25)';g.lineWidth=1;g.stroke();g.fillStyle=color;g.fillText(text,x,y+1);g.textBaseline='alphabetic';
   }
   function questMarker(g,x,y,time) {
@@ -1122,7 +1126,7 @@ if (typeof document !== 'undefined') (() => {
     const goal=b.exit||b.capture;
     ctx.save();ctx.setTransform(viewportRatio,0,0,1,W/2-640*viewportRatio,0);ctx.drawImage(map.layer,0,0);
     for(const o of map.objects){const p=iso(o.x,o.y);ctx.drawImage(o.sprite,p.x-100,p.y-215);}
-    rect(ctx,0,0,W,H,'#142d226e');ctx.restore();
+    ctx.setTransform(1,0,0,1,0,0);rect(ctx,0,0,W,H,'#142d226e');ctx.restore();
     for(let sum=0;sum<b.width+b.height;sum++)for(let x=0;x<b.width;x++){
       const y=sum-x;if(y<0||y>=b.height)continue;
       let color=(x+y)%2?'#88956b':'#829167',stroke='#ced0a342';
@@ -1208,7 +1212,7 @@ if (typeof document !== 'undefined') (() => {
   document.addEventListener('keydown',event=>{
     if(event.ctrlKey||event.altKey||event.metaKey||event.isComposing)return;
     if(modal.open){if(event.key==='Escape'){event.preventDefault();closeModal();}return;}
-    if(keyMoves[event.code]){event.preventDefault();move(...keyMoves[event.code]);return;}
+    if(keyMoves[event.code]){if(event.target.closest('[role="region"][tabindex="0"]'))return;event.preventDefault();move(...keyMoves[event.code]);return;}
     if(event.repeat)return;
     if(event.code==='KeyE'){event.preventDefault();if(battle)battleGuide();else interact(nearSite());}
     if(event.code==='KeyB')panel('bag');if(event.code==='KeyK')panel('skills');if(event.code==='KeyJ')panel('journal');if(event.code==='KeyM')panel('map');if(event.code==='KeyP')panel('party');if(event.code==='KeyT')panel('arena');
@@ -1254,6 +1258,7 @@ if (typeof document !== 'undefined') (() => {
     const zoom=battle&&viewportRatio>1.35?Math.min(1,1.52/viewportRatio):1;
     view.scaleX=viewportRatio*zoom;view.scaleY=zoom;
     view.cameraX=viewportRatio>1.15&&!battle?R.clamp(iso(playerVisual.x,playerVisual.y).x,W/(2*view.scaleX),W-W/(2*view.scaleX)):W/2;
+    ctx.drawImage(MAPS[state.location].backdrop,0,0);
     ctx.save();ctx.translate(W/2,H/2);ctx.scale(view.scaleX,view.scaleY);ctx.translate(-view.cameraX,-H/2);
     if(!battle){drawWorld(elapsed);if(!path.length)updatePrompt();}
     else drawBattle(elapsed);
@@ -1264,7 +1269,7 @@ if (typeof document !== 'undefined') (() => {
   for(const location of Object.keys(LOCATIONS))MAPS[location]=createMap(location);
   for(const map of Object.values(MAPS))for(const object of map.objects)object.sprite=scenerySprite(object);
   if(!walkable(state.x,state.y)){Object.assign(state,LOCATIONS[state.location].spawn);playerVisual={x:state.x,y:state.y};}
-  new ResizeObserver(()=>{const box=canvas.getBoundingClientRect();viewportRatio=Math.max(1,(box.height/H)/(box.width/W));}).observe(canvas);
+  new ResizeObserver(()=>{const box=canvas.getBoundingClientRect();if(box.width>0&&box.height>0){canvasDisplayScale=box.height/H;viewportRatio=canvasDisplayScale/(box.width/W);}}).observe(canvas);
   ctx.imageSmoothingEnabled=false;drawPortrait($('portrait'));renderHud();
   if(migrated)save();
   if(!storageAvailable)$('save-status').textContent='本地存档暂不可用';

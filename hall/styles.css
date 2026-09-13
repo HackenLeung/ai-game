@@ -254,6 +254,9 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible), summary:focus:not
 .detail-badge .icon { width: 16px; height: 16px; }
 .detail-body, .guide-body { padding: 30px; }
 .detail-body > .eyebrow { font-size: 9px; margin-bottom: 9px; color: #8e9d7e; }
+.detail-title-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.detail-title-row h2 { min-width: 0; }
+.detail-title-row > .button { flex-shrink: 0; white-space: nowrap; }
 .detail-body h2, .guide-body h2 { font-family: var(--serif); font-size: 30px; line-height: 1.5; letter-spacing: 1px; }
 .detail-body h2 span { display: inline-block; font-family: var(--sans); font-size: 12px; color: #8f9f7a; font-weight: 400; margin-left: 16px; letter-spacing: 2px; }
 .detail-intro { font-size: 12px; color: #819174; line-height: 1.9; margin-top: 12px; }
@@ -424,6 +427,9 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible), summary:focus:not
   .detail-body, .guide-body { padding: 26px 22px; }
   .detail-body h2 { font-size: 27px; }
   .detail-body h2 span { display: block; margin: 6px 0 0; font-size: 11px; }
+  .detail-title-row { align-items: flex-start; gap: 12px; }
+  .detail-title-row > .button { gap: 7px; padding-inline: 12px; font-size: 12px; }
+  .detail-title-row > .button .icon { width: 15px; height: 15px; }
   .controls-list { grid-template-columns: 1fr; }
   .detail-action { gap: 13px; flex-wrap: wrap; }
   .guide-body h2 { font-size: 21px; }
@@ -488,6 +494,8 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible), summary:focus:not
   .feature-label { letter-spacing: 0; }
   .hero-actions { gap: 13px; }
   .hero-play { min-width: 125px; padding-left: 12px; padding-right: 12px; }
+  .detail-title-row { gap: 10px; }
+  .detail-title-row h2 { font-size: 22px; letter-spacing: .5px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }

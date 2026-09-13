@@ -873,6 +873,105 @@ dialog[open] { animation: panel-arrive .18s ease-out; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Fit the adventure, shortcuts and current objective into a desktop viewport. */
+@media (min-width: 1000px) {
+  html { scrollbar-gutter: auto; }
+  body { height: 100dvh; min-height: 660px; display: flex; flex-direction: column; }
+  .site-header { flex: 0 0 56px; height: 56px; width: 100%; max-width: 1760px; margin: 0 auto; padding: 0 clamp(20px, 2.5vw, 44px); gap: 18px; }
+  .brand { gap: 10px; }
+  .brand-mark { width: 28px; height: 34px; }
+  .brand-mark svg { width: 25px; height: 27px; }
+  .brand-name { font-size: 24px; letter-spacing: 3px; }
+  .brand-name > span { margin-top: 4px; font-size: 6px; letter-spacing: 2.6px; }
+  .seal { font-size: 9px; }
+  .main-nav { padding: 3px; }
+  .nav-button { min-height: 36px; padding: 0 11px; font-size: 11px; }
+  .header-actions { gap: 7px; }
+  .save-button, .header-actions .icon-button { height: 34px; }
+  .save-button span { display: inline; }
+  .app-shell { flex: 1; min-height: 0; width: 100%; max-width: 1760px; margin: 0 auto; padding: 0 clamp(20px, 2.5vw, 44px); display: flex; flex-direction: column; }
+  .chapter-bar { flex: 0 0 auto; min-height: 62px; padding: 9px 0; }
+  .chapter-title { gap: 12px; }
+  .chapter-number { width: 32px; height: 38px; font-size: 22px; }
+  .chapter-link { margin-bottom: 3px; font-size: 9px; }
+  .chapter-bar h1 { font-size: 23px; letter-spacing: 2px; }
+  #chapter-subtitle { margin-left: 16px; font-size: 11px; }
+  .game-layout { flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) clamp(280px, 24vw, 320px); gap: 18px; align-items: stretch; }
+  .adventure-column { min-height: 0; display: flex; flex-direction: column; }
+  .stage-shell { flex: 1; height: auto; min-height: 280px; max-height: none; border-radius: 12px; }
+  .location-heading { left: 22px; top: 19px; }
+  .location-heading h2 { font-size: 32px; letter-spacing: 5px; margin-top: 5px; }
+  .location-heading p { font-size: 12px; margin-top: 4px; }
+  .scene-status { top: 18px; right: 18px; }
+  .map-button { right: 16px; bottom: 39px; min-height: 36px; padding: 7px 10px; gap: 7px; }
+  .scene-bottom { left: 20px; right: 18px; bottom: 12px; font-size: 10px; }
+  .interact-prompt { bottom: 43px; padding: 8px 12px; min-height: 38px; }
+  .action-dock { flex: 0 0 auto; margin-top: 8px; padding: 8px; gap: 12px; border-radius: 10px; }
+  .stance { max-width: 132px; gap: 8px; }
+  .stance-emblem { width: 32px; height: 32px; }
+  .stance-emblem svg { width: 20px; height: 20px; }
+  .stance strong { font-size: 16px; }
+  .stance div > span { margin-top: 4px; }
+  .skill-hotbar { gap: 5px; }
+  .hotkey { height: 59px; padding: 11px 2px 6px; gap: 4px; border-radius: 7px; }
+  .hotkey > svg { width: 22px; height: 22px; }
+  .hotkey > span { font-size: 10px; }
+  .hotkey kbd { top: 3px; left: 5px; }
+  .travel-log { flex: 0 0 40px; min-height: 40px; align-items: center; gap: 10px; padding: 4px 2px; }
+  .travel-log p { font-size: 11px; line-height: 1.5; }
+  .sidebar { min-height: 0; gap: 10px; }
+  .panel { padding: 11px; border-radius: 10px; }
+  .character-panel { flex: 0 0 auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 10px; }
+  .character-panel > .panel-heading { display: none; }
+  .character-identity { grid-column: 1 / -1; gap: 10px; margin: 0; }
+  .portrait-frame { width: 40px; height: 48px; padding: 2px; border-radius: 7px; }
+  .portrait-frame > span { left: 11px; bottom: -4px; min-width: 18px; height: 15px; padding: 0 3px; font-size: 10px; }
+  .character-name { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px 8px; }
+  .character-name .eyebrow { grid-column: 1 / -1; font-size: 9px; }
+  .character-name h2 { margin: 0; font-size: 24px; letter-spacing: 2px; }
+  .rank { font-size: 9px; padding: 2px 5px; }
+  .stat { margin: 0; }
+  .stat > div:first-child { margin-bottom: 4px; font-size: 11px; }
+  .stat > div:first-child > span { gap: 4px; }
+  .stat small { font-size: 9px; }
+  .character-footer { grid-column: 1 / -1; margin: 0; padding-top: 5px; }
+  .party-shortcut { grid-column: 1 / -1; margin: 0; padding-top: 5px; min-height: 26px; }
+  .build-shortcut { grid-column: 1 / -1; margin: 0; padding: 5px 8px; min-height: 27px; }
+  .battle-resources { grid-column: 1 / -1; margin: 0; padding: 6px 8px; gap: 4px 8px; line-height: 1.5; }
+  .battle-mode .character-identity, .battle-mode .party-shortcut, .battle-mode .build-shortcut { display: none; }
+  .battle-mode .character-panel > .panel-heading { display: flex; grid-column: 1 / -1; }
+  .quest-panel { flex: 0 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 8px; }
+  .quest-panel > .panel-heading { grid-column: 2; grid-row: 1; justify-content: flex-end; }
+  .quest-panel > .panel-heading > span:first-child { display: none; }
+  .quest-heading { grid-column: 1; grid-row: 1; margin: 0; gap: 7px; }
+  .quest-heading h3 { font-size: 20px; }
+  .quest-symbol { width: 17px; height: 18px; font-size: 11px; }
+  .quest-description, .quest-objective, .quest-rewards, .quest-panel .guide-button, .quest-progress { grid-column: 1 / -1; margin: 0; }
+  .quest-description { max-height: 3.5em; overflow-y: auto; scrollbar-gutter: stable; overscroll-behavior: contain; font-size: 11px; line-height: 1.75; }
+  .quest-objective { gap: 6px; font-size: 11px; line-height: 1.6; }
+  .quest-rewards { max-height: 3.4em; overflow-y: auto; overscroll-behavior: contain; font-size: 10px; line-height: 1.7; gap: 3px 7px; }
+  .quest-panel .guide-button { min-height: 36px; padding: 7px 10px; font-size: 12px; }
+  .surroundings-panel { flex: 1; min-height: 96px; display: flex; flex-direction: column; }
+  .surroundings-panel .panel-heading { flex: 0 0 auto; font-size: 11px; }
+  .nearby-list, .battle-mode .nearby-list { flex: 1; min-height: 0; max-height: none; margin: 6px -3px 0; padding: 0 3px 0 0; scrollbar-gutter: stable; }
+  .nearby-button { padding: 7px 4px; gap: 7px; min-height: 32px; }
+  .nearby-button > span { font-size: 11px; }
+  .enemy-card { padding: 8px 4px; }
+  .enemy-card em { margin: 3px 0; }
+  .surroundings-panel .world-note { display: none; }
+  .battle-mode .surroundings-panel { min-height: 120px; }
+  .battle-banner { top: 16px; padding: 9px 13px; font-size: 12px; }
+  .battle-banner small { margin-top: 4px; }
+  .battle-banner .battle-vitals { display: none; }
+  .battle-mode .location-heading h2 { font-size: 24px; }
+  .app-footer { flex: 0 0 auto; margin-top: 6px; padding: 6px 0; font-size: 9px; }
+  .footer-poem { display: none; }
+  .app-footer button { font-size: 10px; }
+  .app-footer kbd { height: 17px; min-width: 17px; }
+  .quest-description:focus-visible, .quest-rewards:focus-visible, .nearby-list:focus-visible { outline: 2px solid var(--jade); outline-offset: -2px; }
+}
+
 @media (forced-colors: active) {
   button, .panel, .item-card, .skill-card { border: 1px solid ButtonText; }
   button:focus-visible, a:focus-visible { outline: 2px solid Highlight; }

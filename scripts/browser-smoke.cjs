@@ -15,6 +15,38 @@ async function noOverflow(page, label) {
   const dimensions = await page.evaluate(() => ({ viewport: innerWidth, content: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) }));
   assert.ok(dimensions.content <= dimensions.viewport + 1, `${label} overflows: ${JSON.stringify(dimensions)}`);
 }
+
+async function emberFitsViewport(frame, label) {
+  const layout = await frame.locator('body').evaluate(() => {
+    const selectors = ['.main-nav', '#status-grid', '#fire-strip', '#action-grid .action-card', '#craft-filters', '#map-detail', '.inventory-heading', '#item-detail'];
+    const controls = selectors.flatMap(selector => [...document.querySelectorAll(selector)].filter(element => element.getClientRects().length).map(element => {
+      const box = element.getBoundingClientRect();
+      return { selector, top: box.top, bottom: box.bottom, left: box.left, right: box.right, height: box.height };
+    }));
+    return { width: innerWidth, height: innerHeight, pageHeight: document.documentElement.scrollHeight, pageWidth: document.documentElement.scrollWidth, controls };
+  });
+  assert.ok(layout.pageHeight <= layout.height + 1, `${label}: the game requires page scrolling`);
+  assert.ok(layout.pageWidth <= layout.width + 1, `${label}: the game overflows horizontally`);
+  for (const control of layout.controls) {
+    assert.ok(control.height > 0 && control.top >= -1 && control.bottom <= layout.height + 1 && control.left >= -1 && control.right <= layout.width + 1, `${label}: ${control.selector} is outside the viewport`);
+  }
+}
+async function swordFitsViewport(frame, label) {
+  const layout = await frame.locator('body').evaluate(() => {
+    const selectors = ['.main-nav', '#world', '.action-dock .hotkey', '#hp-value', '#mp-value', '#quest-guide', '.surroundings-panel', '.app-footer'];
+    const controls = selectors.flatMap(selector => [...document.querySelectorAll(selector)].filter(element => element.getClientRects().length).map(element => {
+      const box = element.getBoundingClientRect();
+      return { selector, top: box.top, bottom: box.bottom, left: box.left, right: box.right, height: box.height };
+    }));
+    return { width: innerWidth, height: innerHeight, pageHeight: document.documentElement.scrollHeight, pageWidth: document.documentElement.scrollWidth, controls };
+  });
+  assert.ok(layout.pageHeight <= layout.height + 1, `${label}: the game requires page scrolling`);
+  assert.ok(layout.pageWidth <= layout.width + 1, `${label}: the game overflows horizontally`);
+  assert.equal(layout.controls.filter(control => control.selector === '.action-dock .hotkey').length, 10, `${label}: all ten shortcuts remain visible`);
+  for (const control of layout.controls) {
+    assert.ok(control.height > 0 && control.top >= -1 && control.bottom <= layout.height + 1 && control.left >= -1 && control.right <= layout.width + 1, `${label}: ${control.selector} is outside the viewport`);
+  }
+}
 async function gameFrame(page) {
   await page.locator('#game-frame').waitFor({ state: 'visible', timeout: 15000 });
   return page.frameLocator('#game-frame');
@@ -100,6 +132,16 @@ async function readSave(frame, key) {
 
     await page.getByRole('link', { name: '开始游玩余烬', exact: true }).click();
     let ember = await gameFrame(page);
+    for (const size of [{ width: 1920, height: 1080 }, { width: 1366, height: 768 }, { width: 1280, height: 720 }, { width: 1024, height: 768 }]) {
+      await page.setViewportSize(size);
+      for (const view of ['生存', '工坊', '地图']) {
+        await ember.getByRole('button', { name: view, exact: true }).first().click();
+        await emberFitsViewport(ember, `${size.width}×${size.height} ${view}`);
+      }
+    }
+    await page.setViewportSize({ width: 1440, height: 1050 });
+    console.log('PASS 余烬桌面同屏操作，工坊和地图原位切换，行囊使用按钮始终可见');
+
     await ember.getByRole('button', { name: '工坊', exact: true }).click();
     await ember.locator('[data-action="craft"][data-id="axe"]').click();
     assert.equal((await readSave(ember, EMBER)).inventory.axe, 1);
@@ -128,6 +170,22 @@ async function readSave(frame, key) {
     await page.getByRole('link', { name: '开始游玩逸剑风云决', exact: true }).click();
     let sword = await gameFrame(page);
     await sword.locator('#world').waitFor();
+    for (const size of [{ width: 1920, height: 1080 }, { width: 1440, height: 900 }, { width: 1366, height: 768 }, { width: 1280, height: 720 }, { width: 1024, height: 768 }]) {
+      await page.setViewportSize(size);
+      await swordFitsViewport(sword, `${size.width}×${size.height} 逸剑`);
+    }
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await sword.locator('#nearby-list').focus();
+    await page.keyboard.press('ArrowDown');
+    await page.waitForFunction(() => document.querySelector('#game-frame').contentDocument.getElementById('nearby-list').scrollTop > 0);
+    await page.setViewportSize({ width: 1280, height: 650 });
+    assert.equal(await sword.locator('body').evaluate(() => document.documentElement.scrollHeight > innerHeight), true, 'short windows retain page scrolling');
+    await sword.locator('#quest-guide').click();
+    await sword.locator('#dialogue-next').waitFor();
+    while (await sword.locator('#dialogue-next').isVisible()) await sword.locator('#dialogue-next').click();
+    assert.equal((await readSave(sword, SWORD)).stage, 1, 'the quest guide remains usable in a short window');
+    await page.setViewportSize({ width: 1440, height: 1050 });
+    console.log('PASS 逸剑桌面同屏操作、十个快捷键、列表键盘滚动与矮窗口任务指引');
     await sword.locator('.main-nav [data-panel="bag"]').click();
     await sword.locator('#modal[open]').waitFor();
     await sword.locator('#modal-close').click();

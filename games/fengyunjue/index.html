@@ -7,14 +7,14 @@
   <meta name="description" content="可离线游玩的像素武侠江湖。三章、九地、49 段主线，护镖破阵、流派修行、九道悬赏与十二层剑冢。">
   <title>逸剑风云决 · 问剑长歌</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231c3430'/%3E%3Cpath d='M44 9 23 36l5 5L51 16ZM17 34l16 14M23 41l-9 12' stroke='%23d8bd83' stroke-width='4' fill='none'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=4.2">
+  <link rel="stylesheet" href="style.css?v=4.3">
   <script src="expansion.js?v=4.0" defer></script>
   <script src="story.js?v=4.0" defer></script>
   <script src="combat.js?v=4.0" defer></script>
   <script src="rules.js?v=4.0" defer></script>
   <script src="feedback.js?v=4.3" defer></script>
   <script src="audio.js?v=4.3" defer></script>
-  <script src="game.js?v=4.3" defer></script>
+  <script src="game.js?v=4.4" defer></script>
 </head>
 <body>
   <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -118,16 +118,16 @@
         <section class="panel quest-panel">
           <div class="panel-heading"><span>当前指引</span><span class="tag" id="quest-chapter">一章 · 主线</span></div>
           <div class="quest-heading"><span class="quest-symbol">!</span><h3 id="quest-title">一封旧信</h3></div>
-          <p class="quest-description" id="quest-description">故人留信，引你来到这座江南小村。村中的柳伯，或许知道你的身世。</p>
+          <p class="quest-description" id="quest-description" role="region" aria-label="当前任务说明" tabindex="0">故人留信，引你来到这座江南小村。村中的柳伯，或许知道你的身世。</p>
           <div class="quest-objective"><span id="objective-marker"></span><span id="quest-objective">与村长柳伯交谈</span><small id="quest-count">0 / 1</small></div>
-          <div class="quest-rewards" id="quest-rewards"><span>任务奖励</span><span><svg><use href="#i-coin"/></svg>30</span><span><svg><use href="#i-scroll"/></svg>20 修为</span></div>
+          <div class="quest-rewards" id="quest-rewards" role="region" aria-label="任务奖励与战斗提示" tabindex="0"><span>任务奖励</span><span><svg><use href="#i-coin"/></svg>30</span><span><svg><use href="#i-scroll"/></svg>20 修为</span></div>
           <button class="primary-button guide-button" id="quest-guide"><svg><use href="#i-pin"/></svg><span>前往柳伯</span><svg class="arrow"><use href="#i-arrow"/></svg></button>
           <div class="quest-progress" id="quest-progress" aria-label="第一章进度"></div>
         </section>
 
         <section class="panel surroundings-panel">
           <div class="panel-heading"><span>此间江湖</span><span class="location-small" id="nearby-region">梧桐村</span></div>
-          <div id="nearby-list" class="nearby-list"></div>
+          <div id="nearby-list" class="nearby-list" role="region" aria-label="附近人物与战斗目标" tabindex="0"></div>
           <div class="world-note"><svg><use href="#i-leaf"/></svg><span id="world-note">闲来无事，也可在溪边垂钓。</span></div>
         </section>
       </aside>

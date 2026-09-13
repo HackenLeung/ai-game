@@ -23,14 +23,14 @@ async function tapWorld(page,x,y){
   await page.locator('#world').scrollIntoViewIfNeeded();await page.waitForTimeout(210);
   const point=await page.locator('#world').evaluate((canvas,{x,y})=>{
     const box=canvas.getBoundingClientRect(),s=JSON.parse(localStorage.getItem('wandering-sword-v1'));
-    const ratio=Math.max(1,(box.height/760)/(box.width/1280)),center=ratio>1.15?Math.min(1280-1280/(2*ratio),Math.max(1280/(2*ratio),640+(s.x-s.y)*24)):640;
+    const ratio=(box.height/760)/(box.width/1280),center=ratio>1.15?Math.min(1280-1280/(2*ratio),Math.max(1280/(2*ratio),640+(s.x-s.y)*24)):640;
     return{x:box.left+((640+(x-y)*24-center)*ratio+640)/1280*box.width,y:box.top+(55+(x+y)*12-16)/760*box.height};
   },{x,y});await page.mouse.click(point.x,point.y);
 }
 async function moveBattle(page,x,y){
   await page.keyboard.press('0');await page.locator('#world').scrollIntoViewIfNeeded();await page.waitForTimeout(30);
   const point=await page.locator('#world').evaluate((canvas,{x,y})=>{
-    const box=canvas.getBoundingClientRect(),ratio=Math.max(1,(box.height/760)/(box.width/1280)),zoom=ratio>1.35?Math.min(1,1.52/ratio):1;
+    const box=canvas.getBoundingClientRect(),ratio=(box.height/760)/(box.width/1280),zoom=ratio>1.35?Math.min(1,1.52/ratio):1;
     return{x:box.left+(640+(x-y)*54*ratio*zoom)/1280*box.width,y:box.top+(((210+(x+y)*28)-380)*zoom+380)/760*box.height};
   },{x,y});await page.mouse.click(point.x,point.y);
   await page.waitForFunction(({x,y})=>window.__observedCombat.b.player.x===x&&window.__observedCombat.b.player.y===y,{x,y},{timeout:3500});
