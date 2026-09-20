@@ -404,7 +404,7 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible), summary:focus:not
   .help-link > span:not(:first-child) { display: none; }
   .main-nav { display: flex; grid-column: 1/-1; gap: 25px; }
   .main-nav .nav-item { width: auto; border-radius: 0; font-size: 12px; padding: 13px 0; position: relative; gap: 8px; min-height: 44px; }
-  .main-nav .nav-item.active { background: none; color: var(--green); }
+  .main-nav .nav-item.active { background: none; color: var(--green); box-shadow: none; }
   .main-nav .nav-item.active::after { content: ""; position: absolute; bottom: -1px; left: 0; right: 0; background: var(--green); height: 2px; }
   .nav-item.active .nav-count { background: #d9e3cb; color: var(--green); }
   .nav-count { font-size: 9px; min-width: 17px; min-height: 17px; }

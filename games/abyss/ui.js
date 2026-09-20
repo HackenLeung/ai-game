@@ -94,10 +94,18 @@
     </div>`;
   }
 
-  function potionHtml(id, index) {
+  function potionHtml(id, index, options = {}) {
     if (!id) return `<span class="potion empty" aria-hidden="true">${icon('flask')}</span>`;
     const potion = world.POTION_MAP[id];
-    return `<button class="potion" data-potion="${index}" title="${escape(`${potion.name}：${potion.text}`)}" aria-label="${escape(`使用${potion.name}：${potion.text}`)}">${icon('flask')}</button>`;
+    const selected = options.selected === index;
+    return `<button class="potion${selected ? ' selected' : ''}" data-potion="${index}" title="${escape(`${potion.name}：${potion.text}`)}" aria-label="${escape(`使用${potion.name}：${potion.text}`)}" aria-pressed="${selected ? 'true' : 'false'}"${selected ? ' aria-describedby="potion-detail"' : ''}>${icon('flask')}</button>`;
+  }
+
+  // 高亮药水时展示的效果说明，由 app 写入独立的说明元素。
+  function potionDetailHtml(id) {
+    const potion = id && world.POTION_MAP[id];
+    if (!potion) return '';
+    return `<strong>${escape(potion.name)}</strong>${escape(potion.text)}<span class="potion-confirm">再点一次确认使用</span>`;
   }
 
   function playerStatusHtml(state) {
@@ -118,5 +126,5 @@
     return entries.slice(-60).map(entry => `<p class="${escape(entry.kind || 'info')}">${escape(entry.text)}</p>`).join('');
   }
 
-  root.AbyssUI = { escape, icon, cardHtml, cardClass, statusChips, enemyHtml, intentHtml, mapNodeHtml, relicHtml, potionHtml, playerStatusHtml, chapterBannerHtml, logHtml, STATUS_KIND, TYPE_ICON, COLOR_ART };
+  root.AbyssUI = { escape, icon, cardHtml, cardClass, statusChips, enemyHtml, intentHtml, mapNodeHtml, relicHtml, potionHtml, potionDetailHtml, playerStatusHtml, chapterBannerHtml, logHtml, STATUS_KIND, TYPE_ICON, COLOR_ART };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

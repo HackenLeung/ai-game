@@ -9,6 +9,7 @@
   FX.setReduced(reduced);
   let state = null;
   let pendingTarget = null;
+  let pendingPotion = null;
   let finishedShown = false;
   let enemyTimer = 0;
   let seenEvents = 0;
@@ -73,6 +74,8 @@
   // ---------- 渲染 ----------
   function render() {
     if (!state) return;
+    // 药水高亮只在可操作的战斗中保留：离开战斗、战斗结束或槽位变化后自动取消。
+    if (pendingPotion !== null && (!state.battle || state.battle.finished || !state.potions[pendingPotion])) pendingPotion = null;
     const battle = state.battle;
     $('hud-hp').textContent = state.hp;
     $('hud-maxhp').textContent = `/${state.maxHp}`;
@@ -100,6 +103,15 @@
     if (state.pending) handlePending();
     // 维修站、黑市等节点在处理完之前一直挂在 state.visit 上：误关弹层或刷新页面都会重新打开。
     else if (state.visit && overlay.hidden) renderNode();
+  }
+
+  // 药水槽只重绘自身：高亮切换不重建敌人与手牌，避免打断正在播放的动画。
+  function renderPotions() {
+    $('potions').innerHTML = [0, 1, 2].map(index => U.potionHtml(state.potions[index], index, { selected: pendingPotion })).join('');
+    const detail = $('potion-detail');
+    if (!detail) return;
+    detail.innerHTML = U.potionDetailHtml(pendingPotion === null ? null : state.potions[pendingPotion]);
+    detail.hidden = !detail.innerHTML;
   }
 
   // 章节最后一层通过后自动展开下一章，避免地图上不再有可点击的节点。
@@ -132,7 +144,7 @@
     const playing = battle.phase === 'player' && !battle.finished;
     $('energy').classList.toggle('low', playing && battle.energy <= 0);
     renderHand(battle, playing);
-    $('potions').innerHTML = [0, 1, 2].map(index => U.potionHtml(state.potions[index], index)).join('');
+    renderPotions();
     $('end-turn').disabled = !playing;
     $('end-turn').innerHTML = `${battle.phase === 'enemy' ? '敌人行动中' : '结束回合'}${playing ? '<kbd>E</kbd>' : ''}`;
     document.body.classList.toggle('cursor-target', !!pendingTarget);
@@ -325,6 +337,7 @@
         <p><strong>状态</strong>：<em>力量</em>提高攻击伤害，<em>迅捷</em>提高格挡，<em>敏锐</em>提高攻击伤害且不会消失；<em>易伤</em>使受到的攻击伤害 +50%，<em>虚弱</em>使其造成伤害 −25%，<em>中毒</em>在回合开始按层数失去生命，<em>灼烧</em>在回合结束结算，<em>荆棘</em>会反噬攻击者。</p>
         <p><strong>章节成长</strong>：每通过一章，生命上限提升并回复部分生命；每两章额外获得 1 点能量上限。深层章节进入战斗时自带少量格挡，休息恢复量、金币与卡牌质量也会随章节提高。</p>
         <p><strong>地图</strong>：每层只能前进，不能回头。精英给遗物，维修站可以治疗或升级卡牌，黑市用金币交换卡牌与遗物。</p>
+        <p><strong>药水</strong>：战斗中点击药水或按 <kbd>1</kbd>–<kbd>3</kbd> 会先高亮并显示效果，再点一次（或再按同一个数字键）才会真的使用；点其他位置或按 <kbd>Esc</kbd> 取消。</p>
         <p><strong>操作</strong>：点击手牌打出，选择敌人作为目标；<kbd>E</kbd> 或按钮结束回合；<kbd>1</kbd>–<kbd>3</kbd> 使用药水；<kbd>D</kbd> 查看牌组；<kbd>R</kbd> 查看图鉴；<kbd>?</kbd> 打开本说明。</p>
         <p><strong>存档</strong>：每次选择节点或结束战斗后自动保存。可在「存档与设置」中导出或导入。</p>
       </div>`);
@@ -411,6 +424,7 @@
   function endTurn() {
     const battle = state.battle;
     if (!battle || battle.phase !== 'player') return;
+    pendingPotion = null;
     const finish = () => {
       if (!state.battle) return;
       if (state.battle.phase === 'player') {
@@ -456,17 +470,34 @@
     resetEventCursor();
     render();
   }
-  function usePotion(index) {
+  // 药水需要两步：第一次点击高亮并说明效果，再点一次才真的使用。
+  function selectPotion(index) {
     const potion = world.POTION_MAP[state.potions[index]];
     if (!potion) return;
-    if (!E.usePotion(state, index)) { flash('这瓶药水只能在战斗中使用'); return; }
+    if (pendingPotion === index) { usePotion(index); return; }
+    pendingPotion = index;
+    renderPotions();
+  }
+  function usePotion(index) {
+    const potion = world.POTION_MAP[state.potions[index]];
+    if (!potion) { pendingPotion = null; renderPotions(); return; }
+    if (!E.usePotion(state, index)) { pendingPotion = null; renderPotions(); flash('这瓶药水只能在战斗中使用'); return; }
+    pendingPotion = null;
     FX.rise($('potions'), 'block');
     save(); render(); flash(`使用了${potion.name}`);
+  }
+  // 点击药水以外的位置取消高亮，避免误触。
+  function clearPendingPotion() {
+    if (pendingPotion === null) return;
+    pendingPotion = null;
+    if (state.battle) renderPotions();
   }
 
   // ---------- 事件绑定 ----------
   document.addEventListener('click', event => {
     const target = event.target;
+    // 药水高亮时，点到其他位置先取消高亮，不影响本次操作本身。
+    if (!target.closest('[data-potion]')) clearPendingPotion();
     const nodeButton = target.closest('[data-node]');
     if (nodeButton) { enterFloor(Number(nodeButton.dataset.node)); return; }
     const enemyButton = target.closest('[data-enemy]');
@@ -491,7 +522,7 @@
       return;
     }
     const potionButton = target.closest('[data-potion]');
-    if (potionButton) { usePotion(Number(potionButton.dataset.potion)); return; }
+    if (potionButton) { selectPotion(Number(potionButton.dataset.potion)); return; }
     const action = target.closest('[data-action]');
     if (action) {
       const name = action.dataset.action;
@@ -563,12 +594,13 @@
 
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !overlay.hidden) { dismissOverlay(); return; }
+    if (event.key === 'Escape') { clearPendingPotion(); return; }
     if (event.target.tagName === 'TEXTAREA' || event.target.tagName === 'INPUT') return;
     if (event.key === 'e' || event.key === 'E') { event.preventDefault(); endTurn(); }
     else if (event.key === 'd' || event.key === 'D') openDeck();
     else if (event.key === 'r' || event.key === 'R') openRelics();
     else if (event.key === '?' || event.key === '/') openHelp();
-    else if (/^[1-3]$/.test(event.key)) usePotion(Number(event.key) - 1);
+    else if (/^[1-3]$/.test(event.key)) selectPotion(Number(event.key) - 1);
   });
   window.addEventListener('beforeunload', save);
 

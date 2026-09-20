@@ -347,7 +347,7 @@ kbd {
 .energy.low { border-color: #5c2833; color: #ff8a94; background: radial-gradient(120% 140% at 30% 0%, #35151c, #1a0d11 70%); box-shadow: 0 0 20px #ff5f6d2e, inset 0 1px 0 #ffffff17; }
 
 .hand { flex: 1 1 auto; display: flex; gap: 9px; align-items: flex-end; justify-content: center; min-height: calc(var(--card-h) + 12px); padding: 14px 4px 2px; overflow-x: auto; overflow-y: hidden; }
-.battle-actions { display: flex; flex: 0 0 auto; flex-direction: column; gap: 8px; }
+.battle-actions { position: relative; display: flex; flex: 0 0 auto; flex-direction: column; gap: 8px; }
 .potions { display: flex; gap: 6px; }
 .potion {
   display: grid; place-items: center; width: 38px; height: 38px;
@@ -359,6 +359,30 @@ kbd {
 .potion:hover { transform: translateY(-2px); border-color: #7fe2ff; box-shadow: 0 0 18px #58d6ff42, inset 0 1px 0 #ffffff1f; }
 .potion.empty { border-style: dashed; border-color: #232c38; color: #39434f; background: #0b0f14; box-shadow: none; cursor: default; }
 .potion.empty:hover { transform: none; border-color: #232c38; box-shadow: none; }
+/* 高亮等待确认：金色描边与其他「待确认」状态保持一致 */
+.potion.selected {
+  border-color: var(--gold); color: #ffe2ac;
+  background: radial-gradient(120% 120% at 30% 10%, #3d3218, #1d1710);
+  transform: translateY(-2px);
+  animation: potion-ready 1s ease-in-out infinite;
+}
+.potion.selected:hover { border-color: #ffdb99; box-shadow: 0 0 0 2px #ffc96459, 0 0 22px #ffc9644d; }
+@keyframes potion-ready {
+  0%, 100% { box-shadow: 0 0 0 1px #ffc96459, 0 0 14px #ffc96433; }
+  50% { box-shadow: 0 0 0 2px #ffc9648c, 0 0 26px #ffc96473; }
+}
+/* 说明气泡浮在按钮上方，不参与布局、也不拦截点击 */
+.potion-detail {
+  position: absolute; bottom: calc(100% + 9px); left: 0; z-index: 5;
+  width: max-content; max-width: min(260px, 70vw); padding: 8px 11px;
+  border: 1px solid #7a5a22; border-radius: 10px;
+  background: #1a1409f2; color: #ffdb99;
+  box-shadow: var(--shadow-2), inset 0 1px 0 #ffffff14;
+  pointer-events: none;
+  font-size: 11px; line-height: 1.55;
+}
+.potion-detail strong { display: block; margin-bottom: 2px; font-size: 11.5px; color: #ffe9c4; }
+.potion-confirm { display: block; margin-top: 4px; font-size: 10.5px; color: #c9a86a; }
 
 .button {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px;
