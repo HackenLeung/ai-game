@@ -7,7 +7,7 @@ const { collectSiteFiles, ROOT } = require('../scripts/site-files.cjs');
 const { createServer } = require('../scripts/serve.cjs');
 const { games } = require('../hall/catalog.js');
 
-test('both games and every local HTML asset are included in one publishable site', async () => {
+test('every registered game and every local HTML asset are included in one publishable site', async () => {
   const files = await collectSiteFiles();
   const ids = games.map(game => game.id);
   assert.equal(new Set(ids).size, ids.length);
@@ -28,12 +28,12 @@ test('both games and every local HTML asset are included in one publishable site
   assert.ok(files.every(file => !file.endsWith('.cjs') && !file.endsWith('.md') && !file.includes('/tests/') && !file.includes('/scripts/') && !file.includes('node_modules') && !file.includes('.playwright') && !file.endsWith('package.json')));
 });
 
-test('preview serves both games and assets while rejecting private paths and writes', async t => {
+test('preview serves every game and its assets while rejecting private paths and writes', async t => {
   const server = await createServer();
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   t.after(() => new Promise(resolve => server.close(resolve)));
   const base = `http://127.0.0.1:${server.address().port}`;
-  for (const page of ['/', '/play.html?game=jihuan', '/games/fengyunjue/', '/games/jihuan/index.html', '/assets/previews/jihuan.png', '/hall/library.js']) {
+  for (const page of ['/', '/play.html?game=jihuan', '/games/fengyunjue/', '/games/jihuan/index.html', '/games/abyss/index.html', '/assets/previews/abyss.png', '/hall/library.js']) {
     const response = await fetch(base + page);
     assert.equal(response.status, 200, page);
     assert.equal(response.headers.get('x-content-type-options'), 'nosniff');

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0d10">
+  <meta name="description" content="深渊回响：融合星际残骸与亡灵协议的牌组构筑冒险。选择你的核心，穿越十二个章节，直面回响之源。">
+  <title>深渊回响 · 牌组构筑</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0d10'/%3E%3Cpath d='M32 6 52 20v24L32 58 12 44V20Z' fill='none' stroke='%2357d4ff' stroke-width='3'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%23b98bff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="data.js" defer></script>
+  <script src="enemies.js" defer></script>
+  <script src="world.js" defer></script>
+  <script src="engine.js" defer></script>
+  <script src="ui.js" defer></script>
+  <script src="fx.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body data-view="map">
+  <svg class="svg-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.7a5.6 5.6 0 0 0-7.9 0l-.9.9-.9-.9a5.6 5.6 0 0 0-7.9 7.9L12 21l8.8-8.4a5.6 5.6 0 0 0 0-7.9Z"/></symbol>
+      <symbol id="i-energy" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 5v7c0 5 4 8 8 10 4-2 8-5 8-10V5l-8-3Z"/><path d="M9 12l2 2 4-4"/></symbol>
+      <symbol id="i-coin" viewBox="0 0 24 24"><ellipse cx="12" cy="7" rx="8" ry="4"/><path d="M4 7v10c0 2 4 4 8 4s8-2 8-4V7M4 12c0 2 4 4 8 4s8-2 8-4"/></symbol>
+      <symbol id="i-sword" viewBox="0 0 24 24"><path d="m14 4 6-1-1 6L9 19l-4-4ZM3 13l8 8m-4-4-4 4"/></symbol>
+      <symbol id="i-skill" viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/><path d="M12 8v8m-4-4h8"/></symbol>
+      <symbol id="i-power" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2m10-10 2-2"/></symbol>
+      <symbol id="i-claw" viewBox="0 0 24 24"><path d="M4 3c4 2 7 6 8 12M10 3c3 3 5 7 5 12M16 4c2 3 3 7 2 11M21 6c1 4 1 8-1 11"/><path d="M3 21h18"/></symbol>
+      <symbol id="i-skull" viewBox="0 0 24 24"><path d="M6 18C-4 5 7-2 16 3c7 4 8 10 2 15v4H6v-4ZM9 19v3m6-3v3"/><path d="m12 13-2 4h4l-2-4Z"/><ellipse cx="7" cy="11" rx="2" ry="3"/><ellipse cx="17" cy="11" rx="2" ry="3"/></symbol>
+      <symbol id="i-question" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 6 1c0 2-3 2-3 5m0 3v.1"/></symbol>
+      <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M15 3a6 6 0 0 0-4 10l-9 9 2 2 9-9a6 6 0 0 0 10-4l-4 3-4-4 3-4-3-3Z"/></symbol>
+      <symbol id="i-chest" viewBox="0 0 24 24"><path d="M3 9h18v12H3V9Zm0 0 2-5h14l2 5M3 14h18"/><path d="M11 12h2v3h-2z"/></symbol>
+      <symbol id="i-crown" viewBox="0 0 24 24"><path d="M2 8l4 4 6-8 6 8 4-4-2 12H4L2 8Z"/><path d="M4 20h16"/></symbol>
+      <symbol id="i-fire" viewBox="0 0 24 24"><path d="M13 3c3 5-3 7-1 11 2-1 3-3 3-5 7 7 4 12-3 12-8 0-11-6-5-12 0 3 1 4 2 5-2-6 4-7 4-11Z"/></symbol>
+      <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 2h6v5l4 12a3 3 0 0 1-3 4H8a3 3 0 0 1-3-4l4-12V2Zm-6 13h18"/></symbol>
+      <symbol id="i-map" viewBox="0 0 24 24"><path d="m2 5 7-3 6 3 7-3v17l-7 3-6-3-7 3V5Zm7-3v17m6-14v17"/></symbol>
+      <symbol id="i-deck" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6V3Z"/><path d="M15 3v5h5M3 6v15h11"/></symbol>
+      <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5C9 3 5 3 2 4v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-7-1-10 1v15Z"/></symbol>
+      <symbol id="i-save" viewBox="0 0 24 24"><path d="M4 3h13l4 4v14H3V3h1Zm3 0v6h9V3M7 21v-8h10v8"/></symbol>
+      <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 8a3 3 0 0 1 6 1c0 2-3 2-3 5m0 3v.1"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+      <symbol id="i-restart" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 1 8M3 3v7h7"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 5"/></symbol>
+      <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v13m-5-5 5 5 5-5M4 20h16"/></symbol>
+      <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 20V7m-5 5 5-5 5 5M4 4h16"/></symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></symbol>
+      <symbol class="art" id="a-drone" viewBox="0 0 120 120"><path d="M30 40h60l10 20-10 20H30L20 60Z" fill="currentColor" opacity=".9"/><circle cx="60" cy="60" r="14" fill="#0a0d10"/><circle cx="60" cy="60" r="7" fill="currentColor"/><path d="M20 40 6 28m94 12 14-12M20 80 6 92m94-12 14 12" stroke="currentColor" stroke-width="5" fill="none"/></symbol>
+      <symbol class="art" id="a-mech" viewBox="0 0 120 120"><path d="M26 26h68v56H26z" fill="currentColor" opacity=".9"/><path d="M38 12h44v18H38zM14 40h14v34H14zm78 0h14v34H78z" fill="currentColor" opacity=".75"/><path d="M18 94h24v18H18zm60 0h24v18H78z" fill="currentColor" opacity=".6"/><circle cx="48" cy="52" r="7" fill="#0a0d10"/><circle cx="74" cy="52" r="7" fill="#0a0d10"/></symbol>
+      <symbol class="art" id="a-mite" viewBox="0 0 120 120"><ellipse cx="60" cy="66" rx="34" ry="26" fill="currentColor"/><circle cx="60" cy="32" r="16" fill="currentColor" opacity=".85"/><path d="M28 50 6 34m86 16 22-16M30 78 8 96m82-18 22 18M40 30 32 8m48 22 8-22" stroke="currentColor" stroke-width="6" fill="none"/><circle cx="54" cy="30" r="4" fill="#0a0d10"/><circle cx="68" cy="30" r="4" fill="#0a0d10"/></symbol>
+      <symbol class="art" id="a-crawler" viewBox="0 0 120 120"><path d="M22 46h76l10 26-10 26H22L12 72Z" fill="currentColor"/><path d="M14 56 2 40m104 16 12-16M18 86 6 100m96-14 12 14" stroke="currentColor" stroke-width="7" fill="none"/><circle cx="44" cy="64" r="6" fill="#0a0d10"/><circle cx="76" cy="64" r="6" fill="#0a0d10"/><path d="M44 84h32" stroke="#0a0d10" stroke-width="5"/></symbol>
+      <symbol class="art" id="a-turret" viewBox="0 0 120 120"><path d="M30 84h60l12 26H18Z" fill="currentColor" opacity=".8"/><path d="M36 34h48v50H36z" fill="currentColor"/><path d="M60 34V8m0 0 26 10-26 10" stroke="currentColor" stroke-width="9" fill="none"/><circle cx="60" cy="58" r="11" fill="#0a0d10"/></symbol>
+      <symbol class="art" id="a-mender" viewBox="0 0 120 120"><path d="M60 10 96 32v56L60 110 24 88V32Z" fill="currentColor" opacity=".85"/><path d="M60 30 82 44v32L60 90 38 76V44Z" fill="#0a0d10"/><path d="M60 42v36M42 60h36" stroke="currentColor" stroke-width="7"/></symbol>
+      <symbol class="art" id="a-knight" viewBox="0 0 120 120"><path d="M60 8 96 22v34c0 26-16 44-36 56-20-12-36-30-36-56V22Z" fill="currentColor"/><path d="M44 44h32v14H44z" fill="#0a0d10"/><path d="M60 58v34" stroke="#0a0d10" stroke-width="6"/><path d="M30 30 12 12m78 18 18-18" stroke="currentColor" stroke-width="6"/></symbol>
+      <symbol class="art" id="a-warden" viewBox="0 0 120 120"><path d="M24 30h72v60H24z" fill="currentColor" opacity=".9"/><path d="M34 14h52v16H34zm10 90h8v12h-8zm24 0h8v12h-8z" fill="currentColor" opacity=".7"/><circle cx="46" cy="58" r="9" fill="#0a0d10"/><circle cx="74" cy="58" r="9" fill="#0a0d10"/><path d="M40 80h40" stroke="#0a0d10" stroke-width="6"/><path d="M8 34 24 46m88-12L96 46" stroke="currentColor" stroke-width="7"/></symbol>
+      <symbol class="art" id="a-skeleton" viewBox="0 0 120 120"><circle cx="60" cy="34" r="22" fill="currentColor"/><path d="M52 30a6 6 0 1 0 0 .1M68 30a6 6 0 1 0 0 .1" stroke="#0a0d10" stroke-width="7" fill="none"/><path d="M60 56v40M42 66h36M44 96l-8 22m40-22 8 22M46 30l28 0" stroke="currentColor" stroke-width="8" fill="none"/></symbol>
+      <symbol class="art" id="a-zombie" viewBox="0 0 120 120"><path d="M34 44c0-18 12-28 26-28s26 10 26 28v30c0 16-12 24-26 24s-26-8-26-24Z" fill="currentColor"/><circle cx="48" cy="46" r="6" fill="#0a0d10"/><circle cx="72" cy="46" r="6" fill="#0a0d10"/><path d="M46 74c8 8 20 8 28 0" stroke="#0a0d10" stroke-width="6" fill="none"/><path d="M30 50 6 62m84-12 24 12" stroke="currentColor" stroke-width="9"/></symbol>
+      <symbol class="art" id="a-ghost" viewBox="0 0 120 120"><path d="M60 8c22 0 34 18 34 40v54l-12-12-11 12-11-12-11 12-11-12-12 12V48C26 26 38 8 60 8Z" fill="currentColor" opacity=".92"/><circle cx="48" cy="46" r="7" fill="#0a0d10"/><circle cx="72" cy="46" r="7" fill="#0a0d10"/><path d="M48 68c8 6 16 6 24 0" stroke="#0a0d10" stroke-width="5" fill="none"/></symbol>
+      <symbol class="art" id="a-monk" viewBox="0 0 120 120"><path d="M60 10c20 0 30 14 30 32v10l10 6-10 8v44H30V66l-10-8 10-6V42c0-18 10-32 30-32Z" fill="currentColor"/><path d="M46 44h28v10H46z" fill="#0a0d10"/><path d="M60 60v20m-12 0h24" stroke="#0a0d10" stroke-width="5"/></symbol>
+      <symbol class="art" id="a-cart" viewBox="0 0 120 120"><path d="M14 44h76l16 26v30H14Z" fill="currentColor"/><circle cx="38" cy="102" r="12" fill="currentColor"/><circle cx="86" cy="102" r="12" fill="currentColor"/><path d="M6 62h84" stroke="#0a0d10" stroke-width="5"/><path d="M40 78h44" stroke="#0a0d10" stroke-width="5"/></symbol>
+      <symbol class="art" id="a-amalgam" viewBox="0 0 120 120"><path d="M60 14c26 0 42 20 42 44s-16 48-42 48S18 82 18 58 34 14 60 14Z" fill="currentColor"/><circle cx="44" cy="50" r="8" fill="#0a0d10"/><circle cx="76" cy="50" r="8" fill="#0a0d10"/><circle cx="60" cy="74" r="9" fill="#0a0d10"/><path d="M30 32 16 18m74 14 14-14" stroke="currentColor" stroke-width="7"/></symbol>
+      <symbol class="art" id="a-lord" viewBox="0 0 120 120"><path d="M22 26h76v58H22z" fill="currentColor" opacity=".9"/><path d="M36 10l12 14 12-14 12 14 12-14v16H36Z" fill="currentColor"/><path d="M32 96h12v20H32zm44 0h12v20H44" fill="currentColor" opacity=".7"/><circle cx="46" cy="52" r="8" fill="#0a0d10"/><circle cx="74" cy="52" r="8" fill="#0a0d10"/><path d="M48 76h24" stroke="#0a0d10" stroke-width="6"/></symbol>
+      <symbol class="art" id="a-queen" viewBox="0 0 120 120"><path d="M60 12c18 0 28 14 28 32 0 10 6 14 14 18l-10 44H28L18 62c8-4 14-8 14-18 0-18 10-32 28-32Z" fill="currentColor"/><path d="M32 90h56l-4 22H36Z" fill="currentColor" opacity=".75"/><circle cx="46" cy="46" r="6" fill="#0a0d10"/><circle cx="74" cy="46" r="6" fill="#0a0d10"/><path d="M50 66h20" stroke="#0a0d10" stroke-width="5"/></symbol>
+      <symbol class="art" id="a-spawn" viewBox="0 0 120 120"><path d="M60 8c14 22 34 30 34 54s-16 44-34 44S26 86 26 62 46 30 60 8Z" fill="currentColor"/><path d="M26 46 8 30m86 16 18-16M30 84 10 100m80-16 20 16" stroke="currentColor" stroke-width="6"/><circle cx="50" cy="60" r="7" fill="#0a0d10"/><circle cx="70" cy="60" r="7" fill="#0a0d10"/></symbol>
+      <symbol class="art" id="a-leviathan" viewBox="0 0 120 120"><path d="M12 74c14-30 40-44 62-40 16 3 26 16 26 30 0 18-16 30-38 30-20 0-36-8-50-20Z" fill="currentColor"/><path d="M96 64l22-18-4 26Z" fill="currentColor" opacity=".8"/><circle cx="44" cy="62" r="7" fill="#0a0d10"/><path d="M28 84c10 6 22 8 34 6" stroke="#0a0d10" stroke-width="5" fill="none"/></symbol>
+      <symbol class="art" id="a-swarm" viewBox="0 0 120 120"><circle cx="40" cy="44" r="16" fill="currentColor"/><circle cx="76" cy="38" r="13" fill="currentColor" opacity=".85"/><circle cx="60" cy="72" r="18" fill="currentColor" opacity=".9"/><circle cx="94" cy="76" r="11" fill="currentColor" opacity=".7"/><circle cx="22" cy="78" r="11" fill="currentColor" opacity=".7"/><circle cx="40" cy="44" r="4" fill="#0a0d10"/><circle cx="60" cy="72" r="5" fill="#0a0d10"/></symbol>
+      <symbol class="art" id="a-herald" viewBox="0 0 120 120"><path d="M60 6 92 24v40L60 114 28 64V24Z" fill="currentColor"/><path d="M60 30 78 42v26L60 82 42 68V42Z" fill="#0a0d10"/><circle cx="60" cy="56" r="8" fill="currentColor"/><path d="M18 14 28 26M102 14 92 26" stroke="currentColor" stroke-width="6"/></symbol>
+      <symbol class="art" id="a-golem" viewBox="0 0 120 120"><path d="M28 20h64l10 30-10 50H28L18 50Z" fill="currentColor" opacity=".92"/><path d="M40 40h14v12H40zm26 0h14v12H66zM44 70h32v8H44z" fill="#0a0d10"/><path d="M8 44 18 54m94-10-10 10" stroke="currentColor" stroke-width="8"/></symbol>
+      <symbol class="art" id="a-weaver" viewBox="0 0 120 120"><path d="M60 10c22 0 34 16 34 34l18 12-18 10v12c0 18-16 32-34 32S26 96 26 78V66L8 56l18-12c0-18 12-34 34-34Z" fill="currentColor"/><path d="M60 34v64M36 46l48 0M32 66h56M40 88h40" stroke="#0a0d10" stroke-width="4"/><circle cx="60" cy="50" r="6" fill="#0a0d10"/></symbol>
+      <symbol class="art" id="a-heart" viewBox="0 0 120 120"><path d="M60 22c14-18 44-14 48 12 4 24-18 46-48 76C30 80 8 58 12 34 16 8 46 4 60 22Z" fill="currentColor"/><path d="M34 46h14l8-14 12 30 8-16h10" stroke="#0a0d10" stroke-width="6" fill="none"/><circle cx="60" cy="62" r="42" fill="none" stroke="currentColor" stroke-width="3" opacity=".5"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="app-shell">
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand-mark"><svg class="icon"><use href="#i-energy"/></svg></span>
+        <span class="brand-name">深渊回响<small>ABYSS ECHO</small></span>
+      </div>
+      <div class="hud" id="hud">
+        <span class="hud-item hp" title="生命"><svg class="icon"><use href="#i-heart"/></svg><b id="hud-hp">0</b><i id="hud-maxhp">/0</i></span>
+        <span class="hud-item gold" title="金币"><svg class="icon"><use href="#i-coin"/></svg><b id="hud-gold">0</b></span>
+        <span class="hud-item place" title="章节与层数"><svg class="icon"><use href="#i-map"/></svg><b id="hud-place">第 1 章</b><i id="hud-chapter">· 回响航母</i><i id="hud-floor">0/15</i></span>
+      </div>
+      <nav class="main-nav" aria-label="游戏导航">
+        <button class="nav-button" data-view="map"><svg class="icon"><use href="#i-map"/></svg><span class="nav-label">地图</span></button>
+        <button class="nav-button" data-panel="deck"><svg class="icon"><use href="#i-deck"/></svg><span class="nav-label">牌组</span></button>
+        <button class="nav-button" data-panel="relics"><svg class="icon"><use href="#i-book"/></svg><span class="nav-label">图鉴</span></button>
+        <button class="icon-button" data-panel="help" aria-label="玩法说明" title="玩法说明"><svg class="icon"><use href="#i-help"/></svg></button>
+        <button class="icon-button" data-panel="save" aria-label="存档与设置" title="存档与设置"><svg class="icon"><use href="#i-save"/></svg></button>
+      </nav>
+    </header>
+
+    <main class="stage">
+      <section class="view view-map" id="view-map" aria-label="章节地图">
+        <div class="map-head">
+          <div class="map-hero">
+            <p class="eyebrow" id="chapter-subtitle">THE ECHO CARRIER</p>
+            <h1 id="chapter-name">回响航母</h1>
+            <p class="map-intro" id="chapter-intro"></p>
+          </div>
+          <ol class="map-nodes" id="map-nodes"></ol>
+        </div>
+      </section>
+
+      <section class="view view-battle" id="view-battle" hidden aria-label="战斗">
+        <div class="battle-top">
+          <div class="enemies" id="enemies"></div>
+        </div>
+        <div class="battle-mid">
+          <div class="player-panel">
+            <div class="player-status" id="player-status"></div>
+            <div class="battle-log" id="battle-log" role="log" aria-live="polite" tabindex="0" aria-label="战斗日志"></div>
+          </div>
+          <div class="piles">
+            <button class="pile" id="pile-draw" data-panel="pile-draw"><b id="draw-count">0</b><span>抽牌堆</span></button>
+            <button class="pile" id="pile-discard" data-panel="pile-discard"><b id="discard-count">0</b><span>弃牌堆</span></button>
+            <button class="pile" id="pile-exhaust" data-panel="pile-exhaust"><b id="exhaust-count">0</b><span>消耗堆</span></button>
+          </div>
+        </div>
+        <div class="battle-bottom">
+          <div class="energy" id="energy"><svg class="icon"><use href="#i-energy"/></svg><b id="energy-value">3</b><i id="energy-max">/3</i></div>
+          <div class="hand" id="hand" aria-label="手牌"></div>
+          <div class="battle-actions">
+            <div class="potions" id="potions" aria-label="药水"></div>
+            <button class="button primary" id="end-turn">结束回合<kbd>E</kbd></button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="overlay" id="overlay" hidden>
+      <div class="overlay-card" id="overlay-card" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
+        <button class="overlay-close icon-button" id="overlay-close" aria-label="关闭"><svg class="icon"><use href="#i-close"/></svg></button>
+        <div id="overlay-body"></div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <noscript><div class="noscript">请开启 JavaScript 后再开始这次攀登。</div></noscript>
+</body>
+</html>

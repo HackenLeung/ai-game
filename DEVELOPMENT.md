@@ -31,7 +31,7 @@
 
 ## 存档与数据
 
-- 保持存档键稳定：大厅 `youjian-library-v1`、逸剑风云决 `wandering-sword-v1`、余烬 `ember-wilderness-save-v1`。新游戏使用独立且明确的存档键。
+- 保持存档键稳定：大厅 `youjian-library-v1`、逸剑风云决 `wandering-sword-v1`、余烬 `ember-wilderness-save-v1`、深渊回响 `abyss-echo-save-v1`。新游戏使用独立且明确的存档键。
 - 大厅不读写游戏进度。打开游戏、返回大厅、调整布局或修改规则时，不自动清空存档或开始新周目。
 - 变更存档结构应保留版本识别、旧版本兼容与必要的迁移备份；不要静默丢弃可恢复数据。导入前验证结构和值，读取失败时给出可理解的反馈。
 - 重置、覆盖导入等会丢失进度的游戏内操作，应保留现有确认步骤和恢复能力。
@@ -46,7 +46,7 @@
 | `npm start` | 启动源码预览，默认 `http://127.0.0.1:4177/` |
 | `npm run build` | 生成可发布的静态文件到 `dist/` |
 | `npm run preview` | 预览已构建的 `dist/`，默认端口同上 |
-| `npm test` | 大厅与访问边界、两款游戏规则及主线策略验证 |
+| `npm test` | 大厅与访问边界、三款游戏规则及主线策略验证 |
 | `npm run test:browser` | 在真实浏览器中验证源码和交互 |
 | `npm run test:browser:dist` | 在真实浏览器中验证构建产物 |
 

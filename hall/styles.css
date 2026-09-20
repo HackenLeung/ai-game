@@ -107,6 +107,10 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible), summary:focus:not
 .hero-image { position: absolute; width: 81%; height: 100%; right: -2%; top: 0; object-fit: cover; object-position: 50% 47%; opacity: .86; transition: opacity .3s; }
 .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #163b2e 0%, #163b2ef5 21%, #163b2eae 43%, #152b2d0a 74%), linear-gradient(0deg, #10271deb 0%, transparent 47%, #10251d16 100%); }
 .amber .hero-shade { background: linear-gradient(90deg, #302f20 0%, #302f20f7 19%, #302f209c 48%, #28281900 85%), linear-gradient(0deg, #22271f 0%, transparent 48%); }
+.abyss { background: #0a0e14; }
+.abyss .hero-shade { background: linear-gradient(90deg, #0a1220 0%, #0a1220f7 20%, #0a1220b0 47%, #0a122000 85%), linear-gradient(0deg, #071018 0%, transparent 48%); }
+.abyss .card-category { background: #0d2230c4; color: #cfeaf7; }
+.abyss .featured-content { color: #e6edf5; }
 .scene-caption { position: absolute; top: 25px; right: 25px; display: flex; align-items: center; gap: 7px; color: #d7dfc8b0; font-size: 9px; letter-spacing: .5px; }
 .scene-caption .icon { width: 13px; height: 13px; }
 .featured-content { position: relative; padding: 31px 36px 88px; z-index: 1; }

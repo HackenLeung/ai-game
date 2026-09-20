@@ -5,7 +5,7 @@ const path = require('node:path');
 const { ROOT } = require('./site-files.cjs');
 const hallTests = fs.readdirSync(path.join(ROOT, 'tests')).filter(file => file.endsWith('.test.cjs')).map(file => `tests/${file}`);
 const commands = [
-  ['--test', ...hallTests, 'games/jihuan/tests/game.test.cjs'],
+  ['--test', ...hallTests, 'games/jihuan/tests/game.test.cjs', 'games/abyss/tests/engine.test.cjs'],
   ['games/fengyunjue/verify.cjs'],
   ['games/fengyunjue/test-strategy.cjs']
 ];

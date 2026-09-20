@@ -55,6 +55,31 @@
       saveHelp: '每次行动会自动存档。右上角「存档与设置」可以导出和导入存档。',
       saveKey: 'ember-wilderness-save-v1',
       readySelector: '#stat-hunger'
+    },
+    {
+      id: 'abyss',
+      title: '深渊回响',
+      subtitle: '牌组构筑',
+      english: 'ABYSS ECHO',
+      category: 'deckbuilding',
+      categoryLabel: '卡牌构筑',
+      tags: ['牌组构筑', '随机地牢', '回合策略'],
+      aliases: '杀戮尖塔 爬塔 卡牌 roguelike abyss echo deckbuilder slay',
+      entry: 'games/abyss/index.html',
+      cover: 'assets/previews/abyss.png',
+      screenshot: 'assets/previews/abyss-full.jpg',
+      scene: '回响航母 · 寂静甲板',
+      icon: 'deck',
+      color: 'abyss',
+      description: '一座被遗弃的回响航母，一份残缺的亡灵协议。收集卡牌、组合心法，穿越十二个章节。',
+      hero: '残骸在真空中缓慢旋转。\n舰载协议仍在运行，只是它们已经不再认识你。',
+      facts: [['12', '章攀升路线'], ['101', '张可用卡牌'], ['88', '种敌人与首领']],
+      highlights: ['十二个章节、共 180 层路线：从回响航母一路攀升到回响之源。', '三名可用角色：先驱守卫、腐生术士、心能行者，起始牌组与体系各不相同。', '每回合三点能量，先看敌人意图，再决定进攻还是防守；易伤、虚弱、中毒、灼烧互相牵制。', '地图包含普通战斗、精英、未知事件、维修站、补给舱、黑市与每章首领；进入新章节时核心会成长。'],
+      controls: [['鼠标 / 触屏', '点击手牌出牌，再点敌人选择目标'], ['E', '结束回合'], ['1–3', '使用药水'], ['D / R', '牌组 / 图鉴'], ['?', '玩法说明'], ['Esc', '关闭弹窗']],
+      tip: '先看清敌人头顶的意图数字。格挡会在下个回合开始时清空，所以防御要放在真正被打的那一回合。精英给遗物，值得冒险。',
+      saveHelp: '选择节点、结束战斗与商店交易后自动保存。右上角「存档与设置」可以导出和导入存档。',
+      saveKey: 'abyss-echo-save-v1',
+      readySelector: '#hud-hp'
     }
   ];
   const categories = [...new Map(games.map(game => [game.category, { id: game.category, label: game.categoryLabel, icon: game.icon }])).values()];

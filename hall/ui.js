@@ -21,7 +21,8 @@
     check: '<path d="m5 12 4 4L19 6"/>',
     chevron: '<path d="m6 9 6 6 6-6"/>',
     book: '<path d="M3 4h6l3 2 3-2h6v15h-6l-3 2-3-2H3ZM12 6v15"/>',
-    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>'
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>',
+    deck: '<rect x="3" y="4" width="12" height="17" rx="2"/><path d="M8 4V3h11a2 2 0 0 1 2 2v13h-1"/><path d="M6 8h6M6 12h6M6 16h4"/>'
   };
   const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   const icon = name => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[name] || paths.gamepad}</svg>`;
@@ -51,7 +52,7 @@
       <div class="detail-action"><span>无需下载 · 支持键鼠与触屏</span></div></div>`);
   }
   function showGuide() {
-    show(`<div class="guide-body"><span class="guide-emblem">${icon('leaf')}</span><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="dialog-title">随时出发，也随时回来。</h2><p class="detail-intro">挑一个喜欢的小世界，点击「开始游玩」就能进入。收藏喜欢的游戏，下次在大厅里更快找到它。</p><h3>我的进度会保存吗？</h3><p>两款游戏都有本地存档。使用同一个浏览器、同一个地址打开，就能读取原有进度。隐私窗口和清理站点数据可能让存档消失。</p><h3>怎样带上原来的存档？</h3><ol><li>先打开原来的游戏，在游戏内导出存档文件。</li><li>从这个大厅进入对应游戏，再导入刚才的存档。</li></ol><p>逸剑风云决：打开「游玩指南」。<br>余烬：打开右上角「存档与设置」。</p><h3>可以在手机上玩吗？</h3><p>可以。两款游戏都提供触屏操作。游玩时可以通过顶部按钮查看操作说明，或尝试全屏模式。</p><div class="detail-action"><button class="button primary" data-dismiss>去挑一个游戏${icon('arrow')}</button></div></div>`);
+    show(`<div class="guide-body"><span class="guide-emblem">${icon('leaf')}</span><p class="eyebrow">MAKE YOURSELF AT HOME</p><h2 id="dialog-title">随时出发，也随时回来。</h2><p class="detail-intro">挑一个喜欢的小世界，点击「开始游玩」就能进入。收藏喜欢的游戏，下次在大厅里更快找到它。</p><h3>我的进度会保存吗？</h3><p>每款游戏都有自己的本地存档。使用同一个浏览器、同一个地址打开，就能读取原有进度。隐私窗口和清理站点数据可能让存档消失。</p><h3>怎样带上原来的存档？</h3><ol><li>先打开原来的游戏，在游戏内导出存档文件。</li><li>从这个大厅进入对应游戏，再导入刚才的存档。</li></ol><p>逸剑风云决：打开「游玩指南」。<br>余烬、深渊回响：打开右上角「存档与设置」。</p><h3>可以在手机上玩吗？</h3><p>可以。每款游戏都提供触屏操作。游玩时可以通过顶部按钮查看操作说明，或尝试全屏模式。</p><div class="detail-action"><button class="button primary" data-dismiss>去挑一个游戏${icon('arrow')}</button></div></div>`);
   }
   dialog?.addEventListener('click', event => {
     if (event.target.closest('[data-dismiss]')) dialog.close();
