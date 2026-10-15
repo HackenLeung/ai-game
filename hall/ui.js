@@ -22,7 +22,8 @@
     chevron: '<path d="m6 9 6 6 6-6"/>',
     book: '<path d="M3 4h6l3 2 3-2h6v15h-6l-3 2-3-2H3ZM12 6v15"/>',
     sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>',
-    deck: '<rect x="3" y="4" width="12" height="17" rx="2"/><path d="M8 4V3h11a2 2 0 0 1 2 2v13h-1"/><path d="M6 8h6M6 12h6M6 16h4"/>'
+    deck: '<rect x="3" y="4" width="12" height="17" rx="2"/><path d="M8 4V3h11a2 2 0 0 1 2 2v13h-1"/><path d="M6 8h6M6 12h6M6 16h4"/>',
+    spark: '<path d="M12 3l1.9 6.1L20 12l-6.1 2.9L12 21l-1.9-6.1L4 12l6.1-2.9Z"/><path d="M18.5 4.5 19 6l1.5.5L19 7l-.5 1.5L18 7l-1.5-.5L18 6Z"/>'
   };
   const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
   const icon = name => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[name] || paths.gamepad}</svg>`;

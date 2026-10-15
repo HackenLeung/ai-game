@@ -10,12 +10,48 @@
   <script src="hall/catalog.js" defer></script>
   <script src="hall/library.js" defer></script>
   <script src="hall/ui.js" defer></script>
+  <script src="hall/ai-observer.js" defer></script>
   <script src="hall/player.js" defer></script>
+  <script src="hall/ai-panel.js" defer></script>
 </head>
 <body class="player-page">
   <div class="player-shell" id="player-shell">
-    <header class="player-toolbar"><a class="player-back" href="index.html"><img src="favicon.svg" alt=""><span data-icon="back"></span>返回大厅</a><div class="player-title"><span id="player-title">准备出发</span><small id="player-subtitle"></small></div><div class="player-tools"><button class="tool-button" id="player-help" aria-label="查看游戏操作说明" disabled><span data-icon="help"></span><span class="tool-label">操作说明</span></button><button class="tool-button" id="fullscreen" aria-label="进入全屏" aria-pressed="false"><span data-icon="fullscreen"></span><span class="tool-label">全屏游玩</span></button></div></header>
-    <main class="player-stage"><iframe id="game-frame" class="game-frame" title="游戏画面" allow="fullscreen; autoplay" allowfullscreen hidden></iframe><div class="player-state" id="player-state" role="status"><span class="loading-symbol" data-icon="gamepad"></span><h1>正在走进小世界</h1><p>冒险马上开始。</p></div></main>
+    <header class="player-toolbar"><a class="player-back" href="index.html"><img src="favicon.svg" alt=""><span data-icon="back"></span>返回大厅</a><div class="player-title"><span id="player-title">准备出发</span><small id="player-subtitle"></small></div><div class="player-tools"><button class="tool-button" id="ai-toggle" aria-label="AI 游玩" aria-expanded="false" aria-controls="ai-panel"><span data-icon="spark"></span><span class="tool-label">AI 游玩</span></button><button class="tool-button" id="player-help" aria-label="查看游戏操作说明" disabled><span data-icon="help"></span><span class="tool-label">操作说明</span></button><button class="tool-button" id="fullscreen" aria-label="进入全屏" aria-pressed="false"><span data-icon="fullscreen"></span><span class="tool-label">全屏游玩</span></button></div></header>
+    <main class="player-stage"><iframe id="game-frame" class="game-frame" title="游戏画面" allow="fullscreen; autoplay" allowfullscreen hidden></iframe><div class="player-state" id="player-state" role="status"><span class="loading-symbol" data-icon="gamepad"></span><h1>正在走进小世界</h1><p>冒险马上开始。</p></div>
+      <aside class="ai-panel" id="ai-panel" hidden aria-label="AI 游玩面板">
+        <header class="ai-panel-head">
+          <div><span class="ai-eyebrow"><span data-icon="spark"></span>AI 游玩</span><strong id="ai-status">选择一个模型，让 AI 替你玩。</strong></div>
+          <button class="icon-button" id="ai-close" aria-label="收起 AI 面板"><span data-icon="close"></span></button>
+        </header>
+        <div class="ai-panel-controls">
+          <label class="ai-field"><span>模型</span><select id="ai-model"></select></label>
+          <label class="ai-field short"><span>步数</span><input id="ai-turns" type="number" min="1" max="500" step="1" value="30"></label>
+          <label class="ai-field short"><span>每步间隔</span><input id="ai-delay" type="number" min="0" max="5000" step="100" value="800"></label>
+          <button class="ai-run" id="ai-run" disabled><span data-icon="play"></span><span>开始游玩</span></button>
+          <button class="ai-stop" id="ai-stop" disabled><span data-icon="close"></span><span>停止</span></button>
+          <button class="ai-config-toggle" id="ai-config-toggle" aria-expanded="false" aria-controls="ai-config">配置模型…</button>
+        </div>
+        <form class="ai-config" id="ai-config" hidden>
+          <div class="ai-config-head"><b>接入模型与接口</b><span id="ai-config-path"></span></div>
+          <div class="ai-config-grid">
+            <label class="ai-field"><span>名称</span><input id="ai-cfg-label" type="text" placeholder="例如 我的网关"></label>
+            <label class="ai-field"><span>接口地址</span><input id="ai-cfg-url" type="text" placeholder="http://localhost:8080/v1" spellcheck="false"></label>
+            <label class="ai-field"><span>模型名称</span><input id="ai-cfg-model" type="text" list="ai-cfg-model-list" placeholder="点「测试连接」后从列表里选" spellcheck="false"><datalist id="ai-cfg-model-list"></datalist></label>
+            <label class="ai-field short"><span>密钥</span><input id="ai-cfg-key" type="password" placeholder="可留空" spellcheck="false"></label>
+            <label class="ai-field short"><span>决策方式</span><select id="ai-cfg-engine"><option value="chat">对话模型（输出动作 JSON）</option><option value="jev">决策模型（choice / noul）</option></select></label>
+          </div>
+          <div class="ai-config-actions">
+            <button type="button" class="ai-test" id="ai-cfg-test">测试连接</button>
+            <button type="submit" class="ai-save" id="ai-cfg-save">保存</button>
+            <button type="button" class="ai-cancel" id="ai-cfg-new">新增</button>
+            <button type="button" class="ai-cancel" id="ai-cfg-delete">删除</button>
+          </div>
+          <p class="ai-config-status" id="ai-config-status" role="status"></p>
+        </form>
+        <p class="ai-note" id="ai-note">AI 会读取真实画面并通过真实按钮操作游戏，随时可以接管或停止。</p>
+        <ol class="ai-log" id="ai-log" aria-live="polite"></ol>
+      </aside>
+    </main>
   </div>
   <dialog id="info-dialog" class="info-dialog" aria-labelledby="dialog-title"><button class="dialog-close icon-button" data-dismiss aria-label="关闭详情"><span data-icon="close"></span></button><div id="dialog-content"></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>

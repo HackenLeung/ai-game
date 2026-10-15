@@ -10,7 +10,8 @@
     "preview": "node scripts/serve.cjs --dist",
     "test": "node scripts/test.cjs",
     "test:browser": "node scripts/browser-smoke.cjs",
-    "test:browser:dist": "node scripts/browser-smoke.cjs --dist"
+    "test:browser:dist": "node scripts/browser-smoke.cjs --dist",
+    "ai:play": "node scripts/ai-player.cjs"
   },
   "engines": { "node": ">=18" }
 }

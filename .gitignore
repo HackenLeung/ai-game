@@ -8,4 +8,6 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+.ai-config.json
+.ai-config.json.recovery
 AGENTS.md
