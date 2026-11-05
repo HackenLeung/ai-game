@@ -18,11 +18,25 @@ const browserTools = require('./browser-tools.cjs');
       await page.locator('#view-battle').waitFor();
       await page.locator('.enemy').first().waitFor();
     }
+    if (game.id === 'mahjong') {
+      // 封面用一张已经算好的清一色对对胡。
+      await page.locator('.mj-tab[data-tab="score"]').click();
+      for (const id of [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4]) {
+        await page.locator(`#mj-picker button[data-tile="${id}"]`).click();
+      }
+      await page.locator('#mj-f-dealer').check();
+    }
   }
   async function cover(page, game, target) {
     if (game.id === 'fengyunjue') {
       const data = await page.locator('#world').evaluate(canvas => canvas.toDataURL('image/png').split(',')[1]);
       await fs.writeFile(target, Buffer.from(data, 'base64'));
+      return;
+    }
+    if (game.id === 'mahjong') {
+      // 牌桌适合横向构图：直接取当前视口，保留牌墙、手牌、印章与账本。
+      await page.evaluate(() => window.scrollTo(0, 96));
+      await page.screenshot({ path: target, animations: 'disabled' });
       return;
     }
     const selector = game.id === 'abyss' ? '.view-battle' : '.landscape';
@@ -35,7 +49,7 @@ const browserTools = require('./browser-tools.cjs');
       const context = await browser.newContext({ viewport: { width: 1600, height: 1100 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
       const page = await context.newPage();
       await page.goto(pathToFileURL(path.join(ROOT, game.entry)).href);
-      await page.locator(game.readySelector).waitFor();
+      await page.locator(game.readySelector).first().waitFor();
       await prepare(page, game);
       await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
       await page.screenshot({ path: path.join(ROOT, game.screenshot), fullPage: true, type: 'jpeg', quality: 82, animations: 'disabled' });

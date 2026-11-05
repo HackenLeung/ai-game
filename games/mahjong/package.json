@@ -1,0 +1,10 @@
+{
+  "name": "mahjong-tutor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "麻雀学堂 · 广东牌拿牌、算番、筹码与四人对局",
+  "scripts": {
+    "test": "node --test tests/rules.test.cjs tests/match.test.cjs"
+  },
+  "engines": { "node": ">=18" }
+}

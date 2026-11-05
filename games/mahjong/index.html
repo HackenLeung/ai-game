@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b3226">
+<meta name="description" content="麻雀学堂：广东牌从拿牌、算番到筹码结算的互动教程，还能和三家电脑打一局 136 张四人对局。掷骰开门、听牌练习、番种与筹码记账，全部用真实麻将牌面演示。">
+<title>麻雀学堂 · 广东牌算番、筹码与对局</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b3226'/%3E%3Crect x='12' y='10' width='40' height='44' rx='6' fill='%23f6efdc'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='30' fill='%23b3352a' font-family='serif'%3E%E9%BA%BB%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="mj-app" id="mj-app">
+
+  <header class="mj-top">
+    <div class="mj-brand">
+      <span class="mj-logo" aria-hidden="true">雀</span>
+      <div class="mj-brand-text">
+        <h1>麻雀学堂</h1>
+        <p>广东牌 · 算番、筹码与对局</p>
+      </div>
+    </div>
+    <div class="mj-top-actions">
+      <label class="mj-field-inline">
+        <span>玩法</span>
+        <select id="mj-style">
+          <option value="ghost" selected>鬼牌（百搭）</option>
+          <option value="flower">花牌 8 张</option>
+          <option value="none">都不加</option>
+        </select>
+      </label>
+      <span class="mj-badge" id="mj-badge">三番起胡 · 封顶 13 番</span>
+    </div>
+  </header>
+
+  <nav class="mj-tabs" role="tablist" aria-label="学堂分区">
+    <button class="mj-tab" id="tab-learn" role="tab" aria-selected="true" aria-controls="mj-panel-learn" data-tab="learn"><b>01</b><span>学 · 上手</span></button>
+    <button class="mj-tab" id="tab-draw" role="tab" aria-selected="false" aria-controls="mj-panel-draw" data-tab="draw"><b>02</b><span>拿牌 · 开局</span></button>
+    <button class="mj-tab" id="tab-score" role="tab" aria-selected="false" aria-controls="mj-panel-score" data-tab="score"><b>03</b><span>算番 · 番种</span></button>
+    <button class="mj-tab" id="tab-chips" role="tab" aria-selected="false" aria-controls="mj-panel-chips" data-tab="chips"><b>04</b><span>筹码 · 结算</span></button>
+    <button class="mj-tab" id="tab-match" role="tab" aria-selected="false" aria-controls="mj-panel-match" data-tab="match"><b>05</b><span>对局 · 四人麻将</span></button>
+    <button class="mj-tab" id="tab-drill" role="tab" aria-selected="false" aria-controls="mj-panel-drill" data-tab="drill"><b>06</b><span>练 · 胡牌与听牌</span></button>
+  </nav>
+
+  <main class="mj-main">
+
+    <!-- ============ 学 ============ -->
+    <section class="mj-panel" id="mj-panel-learn" role="tabpanel" aria-labelledby="tab-learn">
+      <div class="mj-panel-head">
+        <p class="mj-eyebrow">零基础 · 七节课</p>
+        <h2>先把牌桌的规矩弄明白</h2>
+        <p class="mj-lede">广东牌和别的麻将最大的不同是<strong>三番起胡</strong>：牌型本身不一定有番，要靠番种凑够三番才能胡。先按顺序看完这七节，再去<strong>算番</strong>里点几手牌，比看十篇文章都快。</p>
+      </div>
+
+      <div class="mj-lessons" id="mj-lessons"></div>
+
+      <div class="mj-card mj-glossary-card">
+        <p class="mj-eyebrow">术语速查</p>
+        <dl class="mj-glossary" id="mj-glossary"></dl>
+      </div>
+
+      <p class="mj-footnote">广东牌与香港旧章、新章、跑马仔的番数都有出入，本页按常见「旧章 · 三番起胡」整理，具体以你们牌桌约定为准。</p>
+    </section>
+
+    <!-- ============ 拿牌 ============ -->
+    <section class="mj-panel" id="mj-panel-draw" role="tabpanel" hidden>
+      <div class="mj-panel-head">
+        <p class="mj-eyebrow">开局 · 拿牌</p>
+        <h2>掷完骰子，到底从谁家拿？</h2>
+        <p class="mj-lede">选数法、骰子点数和座位，下面会算出开门方位、从第几墩开始，以及每个人拿几张。</p>
+      </div>
+
+      <div class="mj-card">
+        <div class="mj-form-grid">
+          <label class="mj-field mj-span2">
+            <span>骰子数法</span>
+            <select id="mj-mode">
+              <option value="bigPerson" selected>分大小：大数数人、小数数墩</option>
+              <option value="smallPerson">分大小：小数数人、大数数墩</option>
+              <option value="sum">两粒相加</option>
+            </select>
+          </label>
+          <label class="mj-field"><span>第一粒骰</span><select id="mj-die1"></select></label>
+          <label class="mj-field"><span>第二粒骰</span><select id="mj-die2"></select></label>
+          <label class="mj-field"><span>第三粒（相加时用）</span><select id="mj-die3"></select></label>
+          <label class="mj-field"><span>我坐哪</span>
+            <select id="mj-me">
+              <option value="0" selected>东位</option>
+              <option value="1">南位</option>
+              <option value="2">西位</option>
+              <option value="3">北位</option>
+            </select>
+          </label>
+          <label class="mj-field"><span>庄家方位</span>
+            <select id="mj-dealer">
+              <option value="0">东位</option>
+              <option value="1">南位</option>
+              <option value="2">西位</option>
+              <option value="3">北位</option>
+            </select>
+          </label>
+          <label class="mj-field mj-span2"><span>从哪一墩开始拿</span>
+            <select id="mj-stack-mode">
+              <option value="next" selected>从下一墩开始（常见）</option>
+              <option value="same">从数到的那一墩开始</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="mj-table" id="mj-table">
+          <div class="mj-table-seat mj-seat-top">
+            <span class="mj-seat-name">对家</span>
+            <span class="mj-seat-meta">西位</span>
+          </div>
+          <div class="mj-table-seat mj-seat-left">
+            <span class="mj-seat-name">上家</span>
+            <span class="mj-seat-meta">北位</span>
+          </div>
+          <div class="mj-table-center">
+            <div class="mj-dice" id="mj-dice" aria-hidden="true"></div>
+            <span class="mj-dice-label" id="mj-dice-label">大 / 小</span>
+          </div>
+          <div class="mj-table-seat mj-seat-right">
+            <span class="mj-seat-name">下家</span>
+            <span class="mj-seat-meta">南位</span>
+          </div>
+          <div class="mj-table-seat mj-seat-bottom">
+            <span class="mj-seat-name">我</span>
+            <span class="mj-seat-meta">东位 · 你</span>
+          </div>
+        </div>
+
+        <ol class="mj-steps" id="mj-draw-steps"></ol>
+      </div>
+    </section>
+
+    <!-- ============ 算番 ============ -->
+    <section class="mj-panel" id="mj-panel-score" role="tabpanel" hidden>
+      <div class="mj-panel-head">
+        <p class="mj-eyebrow">算番 · 番种</p>
+        <h2>把牌摆上桌，看它值几番</h2>
+        <p class="mj-lede">点牌加入手牌（最多 14 张，有杠可到 15 张）。下面会实时拆牌、列番种、算钱；不想算番，就去<strong>筹码</strong>页直接记账。</p>
+      </div>
+
+      <div class="mj-score-layout">
+        <div class="mj-score-main">
+          <div class="mj-card">
+            <p class="mj-card-title">牌墙</p>
+            <div class="mj-picker" id="mj-picker"></div>
+
+            <div class="mj-rack-head">
+              <span id="mj-count">0 / 14 张</span>
+              <span class="mj-rack-actions">
+                <button type="button" class="mj-btn mj-btn-ghost" id="mj-undo">撤销一张</button>
+                <button type="button" class="mj-btn mj-btn-ghost" id="mj-clear">清空</button>
+              </span>
+            </div>
+            <div class="mj-rack" id="mj-rack" aria-live="polite">
+              <span class="mj-rack-empty">点上面的牌，摆进手牌</span>
+            </div>
+
+            <div class="mj-form-grid mj-form-grid-tight">
+              <label class="mj-field"><span>圈风</span>
+                <select id="mj-round-wind">
+                  <option value="0" selected>东风圈</option>
+                  <option value="1">南风圈</option>
+                  <option value="2">西风圈</option>
+                  <option value="3">北风圈</option>
+                </select>
+              </label>
+              <label class="mj-field"><span>门风</span>
+                <select id="mj-seat-wind">
+                  <option value="0" selected>东位</option>
+                  <option value="1">南位</option>
+                  <option value="2">西位</option>
+                  <option value="3">北位</option>
+                </select>
+              </label>
+              <label class="mj-field" id="mj-ghost-field"><span>鬼牌是哪张</span>
+                <select id="mj-ghost">
+                  <option value="31" selected>红中</option>
+                  <option value="33">白板</option>
+                  <option value="32">发财</option>
+                </select>
+              </label>
+              <label class="mj-field" id="mj-flower-field"><span>花牌数量</span><select id="mj-flowers"></select></label>
+              <label class="mj-field" id="mj-own-flower-field"><span>其中正花</span><select id="mj-own-flowers"></select></label>
+            </div>
+
+            <div class="mj-checks">
+              <label class="mj-check"><input type="checkbox" id="mj-f-selfdraw"><span>自摸</span></label>
+              <label class="mj-check"><input type="checkbox" id="mj-f-closed"><span>门前清</span></label>
+              <label class="mj-check"><input type="checkbox" id="mj-f-kong"><span>杠上开花</span></label>
+              <label class="mj-check"><input type="checkbox" id="mj-f-last"><span>海底捞月</span></label>
+              <label class="mj-check"><input type="checkbox" id="mj-f-robbing"><span>抢杠</span></label>
+              <label class="mj-check"><input type="checkbox" id="mj-f-heaven"><span>天胡</span></label>
+              <label class="mj-check"><input type="checkbox" id="mj-f-earth"><span>地胡</span></label>
+              <label class="mj-check"><input type="checkbox" id="mj-f-dealer"><span>庄家</span></label>
+              <label class="mj-check" id="mj-own-flower-check"><input type="checkbox" id="mj-f-own-flower" checked><span>正花另计番</span></label>
+            </div>
+            <p class="mj-note" id="mj-ghost-note">鬼牌按你们桌的规矩：不能碰杠、不能做眼，只能补顺子或刻子；手里的鬼牌自动当万能牌拆牌，<strong>不计番</strong>。</p>
+          </div>
+
+          <div class="mj-ledger" id="mj-ledger" aria-live="polite">
+            <h3>番种账本 <span>等待摆牌</span></h3>
+            <p class="mj-ledger-empty">点牌后这里会列出：拆成哪几组、算了哪些番、总共几番。</p>
+          </div>
+        </div>
+
+        <aside class="mj-score-side">
+          <div class="mj-seal-card">
+            <div class="mj-seal" id="mj-seal">
+              <span id="mj-seal-text">胡</span>
+            </div>
+            <p class="mj-seal-note" id="mj-seal-note">14 张成胡才盖章</p>
+          </div>
+
+          <div class="mj-card mj-settle-card">
+            <p class="mj-card-title">结算规则</p>
+            <label class="mj-field"><span>起胡番数</span>
+              <select id="mj-min-fan">
+                <option value="0">0 番（鸡胡）</option>
+                <option value="1">1 番</option>
+                <option value="3" selected>3 番</option>
+                <option value="4">4 番</option>
+              </select>
+            </label>
+            <label class="mj-field"><span>封顶番数</span>
+              <select id="mj-max-fan">
+                <option value="8">8 番</option>
+                <option value="10">10 番</option>
+                <option value="13" selected>13 番</option>
+                <option value="99">不封顶</option>
+              </select>
+            </label>
+            <label class="mj-field"><span>计分方式</span>
+              <select id="mj-pay-mode">
+                <option value="add" selected>底分 + 番数 × 每番</option>
+                <option value="double">底分 × 2 的番数次方</option>
+              </select>
+            </label>
+            <div class="mj-form-grid mj-form-grid-tight">
+              <label class="mj-field"><span>底分</span><input type="number" id="mj-base" value="1" min="0" step="1"></label>
+              <label class="mj-field"><span>每番分数</span><input type="number" id="mj-per-fan" value="1" min="0" step="1"></label>
+            </div>
+            <label class="mj-check"><input type="checkbox" id="mj-dealer-bonus" checked><span>庄家加半（×1.5，向上取整）</span></label>
+          </div>
+        </aside>
+      </div>
+
+      <div class="mj-card mj-fan-card">
+        <p class="mj-card-title">常见番种</p>
+        <div class="mj-fan-grid" id="mj-fan-table"></div>
+        <p class="mj-note">各桌番数不统一（尤其清一色、七对、混幺九），真正开局前问一句「几番起胡、几番封顶、庄家加不加」最稳。</p>
+      </div>
+    </section>
+
+    <!-- ============ 筹码 ============ -->
+    <section class="mj-panel" id="mj-panel-chips" role="tabpanel" aria-labelledby="tab-chips" hidden>
+      <div class="mj-panel-head">
+        <p class="mj-eyebrow">筹码 · 不算番</p>
+        <h2>自摸、抓马、杠，一把一把记账</h2>
+        <p class="mj-lede">这套算法不看番种：自摸每家 2 个筹码，再按座位抓马加钱；杠另外算。赢家下一把坐庄，座位和马跟着换。只想试算筹码，可以点「随机试算」；想真打一局，去「对局」页。</p>
+      </div>
+
+      <div class="mj-score-layout">
+        <div class="mj-score-main">
+          <div class="mj-card">
+            <p class="mj-card-title">这一把</p>
+            <div class="mj-form-grid">
+              <label class="mj-field"><span>本把庄家（东）</span><select id="mj-chip-dealer"></select></label>
+              <label class="mj-field"><span>谁胡了</span><select id="mj-chip-winner"></select></label>
+              <label class="mj-field"><span>胡法</span>
+                <select id="mj-chip-method">
+                  <option value="self" selected>自摸（三家付）</option>
+                  <option value="discard">出铳（放炮那家付）</option>
+                </select>
+              </label>
+              <label class="mj-field" id="mj-chip-discarder-field" hidden><span>谁放炮</span><select id="mj-chip-discarder"></select></label>
+            </div>
+            <div class="mj-chip-seats" id="mj-chip-seats"></div>
+            <div class="mj-chip-sim">
+              <button type="button" class="mj-btn" id="mj-chip-sim-one">随机试算</button>
+              <button type="button" class="mj-btn mj-btn-ghost" id="mj-chip-sim-many">随机 8 把</button>
+              <span class="mj-chip-sim-note">只算筹码，不是对局；对局去「对局」页</span>
+            </div>
+          </div>
+
+          <div class="mj-card" id="mj-chip-ma-card">
+            <p class="mj-card-title">抓马 <span id="mj-chip-ma-cap"></span></p>
+            <p class="mj-note" id="mj-chip-ma-rule"></p>
+            <div class="mj-ma-set" id="mj-chip-ma-set"></div>
+            <div class="mj-picker" id="mj-chip-ma-picker"></div>
+            <div class="mj-rack-head">
+              <span id="mj-chip-ma-count">0 / 4 张</span>
+              <span class="mj-rack-actions"><button type="button" class="mj-btn mj-btn-ghost" id="mj-chip-ma-clear">清空马牌</button></span>
+            </div>
+            <div class="mj-rack mj-ma-rack" id="mj-chip-ma-drawn">
+              <span class="mj-rack-empty">点上面的牌，摆进这把抓到的马</span>
+            </div>
+            <p class="mj-chip-ma-hits" id="mj-chip-ma-hits"></p>
+          </div>
+
+          <div class="mj-card">
+            <p class="mj-card-title">台面杠</p>
+            <div class="mj-kong-list" id="mj-chip-kongs"></div>
+            <p class="mj-note">前两列填自己杠了几次：公杠（补杠）三家各付 1 个，暗杠三家各付 2 个。后两列填自己打出的牌被别人杠：只有放杠那家付 3 个。没有杠就都留 0。</p>
+          </div>
+
+          <div class="mj-ledger mj-chip-ledger" id="mj-chip-ledger" aria-live="polite">
+            <h3>筹码账本 <span>等待这把手牌</span></h3>
+            <p class="mj-ledger-empty">选好庄家、胡法和杠，再点马牌，这里会列出每一笔。</p>
+          </div>
+
+          <div class="mj-card mj-chip-history-card" id="mj-chip-history-card" hidden>
+            <p class="mj-card-title">记账记录 <span id="mj-chip-history-count"></span></p>
+            <div class="mj-chip-history" id="mj-chip-history"></div>
+          </div>
+        </div>
+
+        <aside class="mj-score-side">
+          <div class="mj-card mj-settle-card">
+            <p class="mj-card-title">筹码大小</p>
+            <div class="mj-form-grid mj-form-grid-tight">
+              <label class="mj-field"><span>自摸每家</span><input type="number" id="mj-chip-pay-self" value="2" min="0" step="1"></label>
+              <label class="mj-field"><span>每中一只马每家</span><input type="number" id="mj-chip-pay-ma" value="1" min="0" step="1"></label>
+              <label class="mj-field"><span>出铳那家付</span><input type="number" id="mj-chip-pay-discard" value="2" min="0" step="1"></label>
+              <label class="mj-field"><span>公杠每家付</span><input type="number" id="mj-chip-pay-exposed" value="1" min="0" step="1"></label>
+              <label class="mj-field"><span>暗杠每家付</span><input type="number" id="mj-chip-pay-concealed" value="2" min="0" step="1"></label>
+              <label class="mj-field"><span>放杠那家付</span><input type="number" id="mj-chip-pay-feeding" value="3" min="0" step="1"></label>
+            </div>
+            <p class="mj-note">默认按你们桌的规矩：自摸 2、中马每只 1、公杠 1、暗杠 2、放杠 3。没有花，所以只看顶部玩法有没有鬼。</p>
+          </div>
+
+          <div class="mj-card">
+            <p class="mj-card-title">累计筹码 <span id="mj-chip-hand-count">第 1 把</span></p>
+            <div class="mj-chip-totals" id="mj-chip-totals"></div>
+            <div class="mj-chip-actions">
+              <button type="button" class="mj-btn mj-btn-primary" id="mj-chip-record">记下这局 · 赢家坐庄</button>
+              <button type="button" class="mj-btn mj-btn-ghost" id="mj-chip-reset">清空累计</button>
+            </div>
+            <p class="mj-chip-status" id="mj-chip-status" role="status"></p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ 对局 ============ -->
+    <section class="mj-panel" id="mj-panel-match" role="tabpanel" aria-labelledby="tab-match" hidden>
+      <div class="mj-panel-head">
+        <p class="mj-eyebrow">对局 · 四人麻将</p>
+        <h2>你和三家电脑打一局，首局坐东</h2>
+        <p class="mj-lede">首局你坐东；赢家下一局坐庄，座位风位跟着换。先摇骰子再开牌；点手牌会先立起来，再点一次才打出。136 张、无鬼无花；摸打、碰杠吃胡都能用，只按筹码结算，不算番、不抓马。</p>
+        <p class="mj-note">对局固定 136 张，不受顶部「玩法」影响；要算鬼牌或花牌，去「算番」「筹码」页。</p>
+      </div>
+
+      <div class="mj-match-layout">
+        <div class="mj-match-board" id="mj-match-board"></div>
+        <aside class="mj-match-side">
+          <div class="mj-card mj-match-status-card">
+            <p class="mj-card-title">牌局</p>
+            <p class="mj-match-status" id="mj-match-status" aria-live="polite"></p>
+          </div>
+
+          <div class="mj-card">
+            <p class="mj-card-title">筹码 <span id="mj-match-hand-no"></span></p>
+            <div class="mj-match-chips" id="mj-match-chips"></div>
+            <p class="mj-note">自摸每家 2，出铳那家 2；公杠每家 1，暗杠每家 2，放杠 3。对局不收马。</p>
+            <div class="mj-match-buttons">
+              <button type="button" class="mj-btn mj-btn-primary" id="mj-match-next">重开本局</button>
+              <button type="button" class="mj-btn mj-btn-ghost" id="mj-match-reset">重置累计</button>
+            </div>
+          </div>
+
+          <div class="mj-card">
+            <p class="mj-card-title">记录</p>
+            <div class="mj-match-log" id="mj-match-log"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ 练 ============ -->
+    <section class="mj-panel" id="mj-panel-drill" role="tabpanel" hidden>
+      <div class="mj-panel-head">
+        <p class="mj-eyebrow">练 · 每天五分钟</p>
+        <h2>先会看胡牌，再会算番</h2>
+        <p class="mj-lede">算番算错，多半是牌没拆对。这里两种题：判断 14 张能不能胡，和 13 张听什么。答完会显示拆解。</p>
+      </div>
+
+      <div class="mj-card">
+        <div class="mj-drill-bar">
+          <button type="button" class="mj-btn mj-btn-primary" id="mj-drill-new">出新题</button>
+          <button type="button" class="mj-btn" id="mj-drill-answer">看答案</button>
+          <span class="mj-stats">
+            <span>答对 <b id="mj-stat-right">0</b></span>
+            <span>答错 <b id="mj-stat-wrong">0</b></span>
+            <span>连对 <b id="mj-stat-streak">0</b></span>
+          </span>
+        </div>
+
+        <div class="mj-drill-stage">
+          <p class="mj-eyebrow" id="mj-drill-type">判断胡牌</p>
+          <div class="mj-rack mj-rack-drill" id="mj-drill-rack"></div>
+          <div class="mj-drill-actions" id="mj-drill-actions"></div>
+          <p class="mj-drill-feedback" id="mj-drill-feedback"></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="mj-footer">
+    <span>牌面为矢量绘制，离线可用</span>
+    <span class="mj-footer-dot">·</span>
+    <span>按常见广东牌（旧章 · 三番起胡）整理</span>
+  </footer>
+</div>
+
+<script src="tiles.js"></script>
+<script src="rules.js"></script>
+<script src="match.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="match-ui.js"></script>
+</body>
+</html>

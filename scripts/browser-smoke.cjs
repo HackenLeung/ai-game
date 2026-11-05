@@ -11,7 +11,7 @@ const SAVE = 'youjian-library-v1';
 const EMBER = 'ember-wilderness-save-v1';
 const SWORD = 'wandering-sword-v1';
 const ABYSS = 'abyss-echo-save-v1';
-const TOTAL_GAMES = 3;
+const TOTAL_GAMES = 4;
 
 async function abyssFitsViewport(frame, label) {
   const layout = await frame.locator('body').evaluate(() => {
@@ -249,6 +249,94 @@ async function readSave(frame, key) {
     await page.getByRole('link', { name: '返回大厅', exact: true }).click();
     console.log('PASS 深渊回响地图、战斗、牌组、存档续玩与进度隔离');
 
+    await page.getByRole('link', { name: '开始游玩麻雀学堂', exact: true }).click();
+    const mahjong = await gameFrame(page);
+    await mahjong.locator('#mj-lessons .mj-lesson').first().waitFor();
+    for (const size of [{ width: 1440, height: 1050 }, { width: 1024, height: 768 }]) {
+      await page.setViewportSize(size);
+      await noOverflow(page, `${size.width}×${size.height} 麻雀学堂外壳`);
+      assert.equal(await mahjong.locator('body').evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, '麻雀学堂不横向溢出');
+    }
+    await page.setViewportSize({ width: 1440, height: 1050 });
+    // 清一色 + 对对胡 = 9 番
+    await mahjong.locator('.mj-tab[data-tab="score"]').click();
+    for (const id of [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4]) {
+      await mahjong.locator(`#mj-picker button[data-tile="${id}"]`).click();
+    }
+    assert.equal(await mahjong.locator('#mj-rack .mj-tile').count(), 14, '手牌 14 张');
+    assert.equal(await mahjong.locator('#mj-seal-text').textContent(), '胡');
+    const ledgerText = await mahjong.locator('#mj-ledger').textContent();
+    assert.match(ledgerText, /清一色/);
+    assert.match(ledgerText, /对对胡/);
+    assert.match(ledgerText, /合计\s*9 番/);
+    // 鬼牌：红中补顺子
+    await mahjong.locator('#mj-clear').click();
+    for (const id of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 10, 31, 31]) {
+      await mahjong.locator(`#mj-picker button[data-tile="${id}"]`).click();
+    }
+    assert.match(await mahjong.locator('#mj-ledger').textContent(), /鬼牌 ×2/);
+    assert.match(await mahjong.locator('#mj-ledger').textContent(), /不计番/);
+    // 花牌模式切换后出现花牌选项
+    await mahjong.locator('#mj-style').selectOption('flower');
+    assert.equal(await mahjong.locator('#mj-flower-field').isVisible(), true);
+    assert.equal(await mahjong.locator('#mj-ghost-field').isVisible(), false);
+    await mahjong.locator('#mj-style').selectOption('ghost');
+    // 拿牌：分大小 3/5，大数数人 -> 第 4 墩
+    await mahjong.locator('.mj-tab[data-tab="draw"]').click();
+    await mahjong.locator('#mj-mode').selectOption('bigPerson');
+    await mahjong.locator('#mj-die1').selectOption('3');
+    await mahjong.locator('#mj-die2').selectOption('5');
+    await mahjong.locator('#mj-stack-mode').selectOption('next');
+    const drawText = await mahjong.locator('#mj-draw-steps').textContent();
+    assert.match(drawText, /第 4 墩开始拿牌/);
+    await mahjong.locator('#mj-stack-mode').selectOption('same');
+    assert.match(await mahjong.locator('#mj-draw-steps').textContent(), /第 3 墩开始拿牌/);
+    // 筹码：下家自摸，有鬼抓 4 张，四张全中
+    await mahjong.locator('.mj-tab[data-tab="chips"]').click();
+    assert.equal(await mahjong.locator('#mj-chip-record').isDisabled(), false, '新一把可以记筹码');
+    await mahjong.locator('#mj-chip-winner').selectOption('1');
+    for (const id of [1, 10, 19, 28]) {
+      await mahjong.locator(`#mj-chip-ma-picker button[data-ma-tile="${id}"]`).click();
+    }
+    await mahjong.locator('#mj-chip-ma-count').filter({ hasText: '4 / 4' }).waitFor();
+    const chipText = await mahjong.locator('#mj-chip-ledger').textContent();
+    assert.match(chipText, /中马 ×4/);
+    assert.match(chipText, /下家（南）\+18/);
+    assert.match(await mahjong.locator('#mj-chip-ma-hits').textContent(), /中马 4 只/);
+    await mahjong.locator('#mj-chip-record').click();
+    assert.equal(await mahjong.locator('#mj-chip-record').isDisabled(), true, '记完这局后按钮暂时锁住');
+    assert.equal(await mahjong.locator('#mj-chip-dealer').inputValue(), '1', '赢家下一把坐庄');
+    assert.match(await mahjong.locator('#mj-chip-totals').textContent(), /下家\+18/);
+    assert.equal(await mahjong.locator('#mj-chip-history .mj-history-row').count(), 1, '记下第一把');
+    // 随机试算：8 把后累计仍守恒
+    await mahjong.locator('#mj-chip-sim-many').click();
+    assert.equal(await mahjong.locator('#mj-chip-history .mj-history-row').count(), 9, '单把 + 随机 8 把');
+    assert.match(await mahjong.locator('#mj-chip-status').textContent(), /随机试算了 8 把/);
+    const chipTotals = await mahjong.locator('#mj-chip-totals b').allTextContents();
+    assert.equal(chipTotals.reduce((sum, text) => sum + Number(text.replace('+', '')), 0), 0, '四家筹码守恒');
+    await mahjong.locator('#mj-chip-sim-one').click();
+    assert.equal(await mahjong.locator('#mj-chip-record').isDisabled(), false, '模拟一把后可以记下');
+    // 对局：先摇骰子，庄家 14 张；点一下立牌，再点一下出牌
+    await mahjong.locator('.mj-tab[data-tab="match"]').click();
+    await mahjong.locator('#mj-match-board .mj-match-hand-tile').first().waitFor();
+    await mahjong.locator('#mj-match-status').filter({ hasText: '你的回合' }).waitFor({ timeout: 5000 });
+    assert.equal(await mahjong.locator('#mj-match-board .mj-match-hand-tile').count(), 14, '庄家手牌 14 张');
+    await mahjong.locator('#mj-match-board .mj-match-hand-tile').first().click();
+    assert.match(await mahjong.locator('#mj-match-status').textContent(), /已选中/);
+    assert.equal(await mahjong.locator('#mj-match-board .mj-match-hand-tile').count(), 14, '第一次点击只立牌');
+    await mahjong.locator('#mj-match-board .mj-match-hand-tile').first().click();
+    assert.equal(await mahjong.locator('#mj-match-board .mj-match-hand-tile').count(), 13, '第二次点击出牌');
+    assert.match(await mahjong.locator('#mj-match-log').textContent(), /打出/);
+    // 练习出题
+    await mahjong.locator('.mj-tab[data-tab="drill"]').click();
+    await mahjong.locator('#mj-drill-new').click();
+    assert.equal(await mahjong.locator('#mj-drill-rack .mj-tile').count() >= 13, true);
+    await page.setViewportSize({ width: 1024, height: 768 });
+    assert.equal(await mahjong.locator('body').evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
+    await page.setViewportSize({ width: 1440, height: 1050 });
+    await page.screenshot({ path: path.join(output, 'mahjong-player-desktop.png'), fullPage: true });
+    await page.getByRole('link', { name: '返回大厅', exact: true }).click();
+    console.log('PASS 麻雀学堂算番、筹码试算、四人对局、鬼牌、花牌切换与拿牌计算');
     await page.getByRole('link', { name: '开始游玩逸剑风云决', exact: true }).click();
     let sword = await gameFrame(page);
     await sword.locator('#world').waitFor();
@@ -289,7 +377,8 @@ async function readSave(frame, key) {
     assert.deepEqual(history.favorites, ['jihuan']);
     assert.equal(Object.keys(history.recent).length, TOTAL_GAMES);
     assert.ok(history.recent.fengyunjue.plays >= 2);
-    console.log('PASS 逸剑背包、手动存档、重载续玩及三款游戏存档隔离');
+    console.log('PASS 逸剑背包、手动存档、重载续玩及四款游戏存档隔离');
+
 
     const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, reducedMotion: 'reduce' });
     const mobile = await mobileContext.newPage();
@@ -335,8 +424,21 @@ async function readSave(frame, key) {
     }
     await mobile.setViewportSize({ width: 390, height: 844 });
     await mobile.screenshot({ path: path.join(output, 'abyss-player-mobile.png'), fullPage: true });
+    await mobile.getByRole('link', { name: '返回大厅', exact: true }).click();
+    await mobile.getByRole('link', { name: '开始游玩麻雀学堂', exact: true }).click();
+    const mobileMahjong = await gameFrame(mobile);
+    await mobileMahjong.locator('#mj-lessons .mj-lesson').first().waitFor();
+    await mobileMahjong.locator('.mj-tab[data-tab="score"]').click();
+    await mobileMahjong.locator('#mj-picker button[data-tile="0"]').click();
+    await mobileMahjong.locator('#mj-picker button[data-tile="9"]').click();
+    for (const width of [320, 390]) {
+      await mobile.setViewportSize({ width, height: 844 });
+      assert.equal(await mobileMahjong.locator('body').evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, `${width}×844 麻雀学堂不横向溢出`);
+    }
+    await mobile.setViewportSize({ width: 390, height: 844 });
+    await mobile.screenshot({ path: path.join(output, 'mahjong-player-mobile.png'), fullPage: true });
     await mobileContext.close();
-    console.log('PASS 320–1440 像素布局、手机收藏以及三款游戏触屏操作');
+    console.log('PASS 320–1440 像素布局、手机收藏以及四款游戏触屏操作');
 
     const blockedContext = await browser.newContext();
     await blockedContext.addInitScript(() => Object.defineProperty(window, 'localStorage', { configurable: true, get() { throw new Error('Storage unavailable'); } }));
@@ -427,7 +529,7 @@ async function readSave(frame, key) {
     await page.goto(base);
     await page.getByRole('button', { name: '随便玩一个', exact: true }).click();
     await gameFrame(page);
-    assert.match(page.url(), /play\.html\?game=(?:fengyunjue|jihuan|abyss)$/);
+    assert.match(page.url(), /play\.html\?game=(?:fengyunjue|jihuan|abyss|mahjong)$/);
     console.log('PASS 子目录部署、直接打开 HTML、随机游玩');
     assert.deepEqual(errors, [], 'browser console and runtime must remain clean');
     console.log(`浏览器验证全部通过。截图：${output}`);
