@@ -22,10 +22,13 @@
   /* ================= 标签切换 ================= */
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.mj-tab'));
   function activate(name) {
+    if (state.tab === 'match' && name !== 'match' && window.MahjongMatchUI) window.MahjongMatchUI.deactivate();
     state.tab = name;
+    $('mj-style-field').hidden = name === 'match';
     tabs.forEach(function (tab) {
       var on = tab.dataset.tab === name;
       tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      tab.tabIndex = on ? 0 : -1;
       var panel = $('mj-panel-' + tab.dataset.tab);
       if (panel) panel.hidden = !on;
     });
@@ -40,6 +43,24 @@
   }
   tabs.forEach(function (tab) {
     tab.addEventListener('click', function () { activate(tab.dataset.tab); });
+    tab.addEventListener('keydown', function (event) {
+      var index = tabs.indexOf(tab);
+      if (event.key === 'ArrowRight') index = (index + 1) % tabs.length;
+      else if (event.key === 'ArrowLeft') index = (index + tabs.length - 1) % tabs.length;
+      else if (event.key === 'Home') index = 0;
+      else if (event.key === 'End') index = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      activate(tabs[index].dataset.tab);
+      tabs[index].focus({ preventScroll: true });
+    });
+  });
+  document.querySelectorAll('[data-go]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      activate(button.dataset.go);
+      $('tab-' + button.dataset.go).focus({ preventScroll: true });
+      document.querySelector('.mj-tabs').scrollIntoView({ block: 'start' });
+    });
   });
 
   /* ================= 课程 ================= */
@@ -1102,6 +1123,10 @@
   });
 
   /* ================= 启动 ================= */
+  $('mj-welcome-art').innerHTML = '<div class="mj-art-ring"></div><div class="mj-art-plinth"></div>' +
+    [18, 32, 31].map(function (id) {
+      return '<span class="mj-tile mj-art-tile">' + T.svg(id) + '</span>';
+    }).join('') + '<p class="mj-art-caption">一索 · 发财 · 红中</p>';
   renderLessons();
   renderFanTable();
   buildDice();

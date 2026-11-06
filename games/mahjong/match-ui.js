@@ -16,6 +16,10 @@
   var sessionApplied = false;
   var session = { chips: [0, 0, 0, 0], hands: 0 };
 
+  function isActive() {
+    return !$('mj-panel-match').hidden && !document.hidden;
+  }
+
   var PIPS = {
     1: [4],
     2: [0, 8],
@@ -49,6 +53,7 @@
 
   function rollDice() {
     clearInterval(rollTimer);
+    rollTimer = null;
     clearTimeout(timer);
     selected = null;
     dice = {
@@ -56,13 +61,19 @@
       b: randDie(),
       finalA: randDie(),
       finalB: randDie(),
+      ticks: 0,
       rolling: true
     };
-    var ticks = 0;
     render();
+    continueRoll();
+  }
+
+  function continueRoll() {
+    if (!dice || !dice.rolling || rollTimer || !isActive()) return;
     rollTimer = setInterval(function () {
-      ticks++;
-      if (ticks >= 10) {
+      if (!isActive()) { deactivate(); return; }
+      dice.ticks++;
+      if (dice.ticks >= 10) {
         clearInterval(rollTimer);
         rollTimer = null;
         dice.a = dice.finalA;
@@ -85,7 +96,7 @@
   }
 
   function tileSpan(id, cls) {
-    return '<span class="mj-tile ' + (cls || 'mj-tile-xs') + '">' + T.svg(id) + '</span>';
+    return '<span class="mj-tile ' + (cls || 'mj-tile-xs') + '" role="img" aria-label="' + T.name(id) + '">' + T.svg(id) + '</span>';
   }
 
   function backSpan() {
@@ -141,10 +152,11 @@
     }).join('');
   }
 
-  function discardsHTML(tiles) {
-    if (!tiles.length) return '<span class="mj-match-empty">—</span>';
-    return tiles.map(function (tile) {
-      return tileSpan(tile, 'mj-tile-xs mj-match-discard');
+  function discardsHTML(tiles, player) {
+    if (!tiles.length) return '<span class="mj-match-empty">还未出牌</span>';
+    return tiles.map(function (tile, index) {
+      var latest = game.lastDiscard && game.lastDiscard.player === player && index === tiles.length - 1 && game.lastDiscard.tile === tile;
+      return tileSpan(tile, 'mj-tile-xs mj-match-discard' + (latest ? ' is-latest' : ''));
     }).join('');
   }
 
@@ -159,12 +171,12 @@
     var turn = game.phase !== 'over' && game.phase !== 'claim-human' && game.turn === player;
     return '<div class="mj-match-seat mj-match-' + position + (turn ? ' is-turn' : '') +
       (game.winner === player ? ' is-winner' : '') + '">' +
-      '<div class="mj-match-seat-head"><b>' + info.name + '</b>' +
+      '<div class="mj-match-seat-head"><i class="mj-match-avatar" aria-hidden="true">' + info.wind + '</i><b>' + info.name + '</b>' +
       '<span>' + info.wind + '位' + (info.isDealer ? ' · 庄' : '') + '</span>' +
       '<span class="mj-match-count">' + info.handCount + ' 张</span></div>' +
       '<div class="mj-match-backs">' + backs + '</div>' +
       '<div class="mj-match-melds">' + meldsHTML(info.melds) + '</div>' +
-      '<div class="mj-match-discards">' + discardsHTML(info.discards) + '</div>' +
+      '<div class="mj-match-discards" aria-label="' + info.name + '的弃牌">' + discardsHTML(info.discards, player) + '</div>' +
       '</div>';
   }
 
@@ -199,14 +211,16 @@
     var turn = game.phase !== 'over' && game.phase !== 'claim-human' && game.turn === HUMAN;
     return '<div class="mj-match-me' + (turn ? ' is-turn' : '') +
       (game.winner === HUMAN ? ' is-winner' : '') + '">' +
-      '<div class="mj-match-seat-head"><b>我</b>' +
+      '<div class="mj-match-seat-head"><i class="mj-match-avatar" aria-hidden="true">' + info.wind + '</i><b>我</b>' +
       '<span>' + info.wind + '位' + (info.isDealer ? ' · 庄' : '') + '</span>' +
       '<span class="mj-match-count">手牌 ' + tiles.length + ' 张' +
       (game.phase === 'over' ? '' : waitsText()) + '</span></div>' +
       '<div class="mj-match-melds">' + meldsHTML(info.melds) + '</div>' +
-      '<div class="mj-match-hand">' + hand + '</div>' +
+      '<p class="mj-match-me-status' + (canDiscard || game.phase === 'claim-human' ? ' is-ready' : '') + '"><span class="mj-live-dot" aria-hidden="true"></span>' + statusText() + '</p>' +
+      '<div class="mj-match-hand" aria-label="我的手牌">' + hand + '</div>' +
+      '<p class="mj-hand-scroll-note">左右滑动查看手牌</p>' +
       '<div class="mj-match-actions mj-match-me-actions" id="mj-match-actions">' + actionsHTML() + '</div>' +
-      '<div class="mj-match-discards">' + discardsHTML(info.discards) + '</div>' +
+      '<div class="mj-match-discards" aria-label="我的弃牌">' + discardsHTML(info.discards, HUMAN) + '</div>' +
       '</div>';
   }
 
@@ -246,7 +260,7 @@
     if (!game) return '';
     if (dice && dice.rolling) return '庄家摇骰子…';
     if (selected && game.phase === 'discard' && game.turn === HUMAN) {
-      return '已选中 ' + T.name(selected.tile) + '，再点一次打出。';
+      return '已选中 ' + T.name(selected.tile) + '，点「打出」或再点一次牌面。';
     }
     if (game.phase === 'over') {
       if (game.winner == null) return '流局，牌墙摸完。';
@@ -288,7 +302,8 @@
       game.pending.forEach(function (claim) {
         if (claim.type === 'chi') {
           html += '<button type="button" class="mj-btn mj-match-claim" data-claim="chi" data-tiles="' +
-            claim.tiles.join(',') + '">吃 ' + claim.tiles.map(T.name).join('') + '</button>';
+            claim.tiles.join(',') + '" aria-label="吃 ' + claim.tiles.map(T.name).join('、') + '">吃 ' +
+            claim.tiles.map(function (tile) { return tileSpan(tile); }).join('') + '</button>';
         } else if (!seen[claim.type]) {
           seen[claim.type] = true;
           var label = claim.type === 'hu' ? '胡' : claim.type === 'gang' ? '杠' : '碰';
@@ -301,10 +316,12 @@
       return html + '<button type="button" class="mj-btn mj-btn-ghost" data-claim="pass">过</button>';
     }
     if (game.turn === HUMAN && game.phase === 'discard') {
-      var self = '';
+      var self = '<button type="button" class="mj-btn mj-btn-primary" data-match="discard"' +
+        (selected ? '' : ' disabled') + '>打出' + (selected ? ' ' + T.name(selected.tile) : '') + '</button>';
       if (selected) {
-        self += '<span class="mj-match-hint">已选 ' + T.name(selected.tile) + '，再点一次打出</span>' +
-          '<button type="button" class="mj-btn mj-btn-ghost" data-match="cancel">取消</button>';
+        self += '<button type="button" class="mj-btn mj-btn-ghost" data-match="cancel">取消</button>';
+      } else {
+        self += '<span class="mj-match-hint">先选一张手牌</span>';
       }
       if (M.canSelfWin(game)) {
         self += '<button type="button" class="mj-btn mj-btn-primary" data-self="win">自摸胡</button>';
@@ -336,13 +353,26 @@
 
   function render() {
     if (!game) return;
+    var board = $('mj-match-board');
+    var active = document.activeElement;
+    var hadBoardFocus = board.contains(active);
+    var focusIndex = board.contains(active) && active.dataset ? active.dataset.handIndex : null;
+    var focusAction = board.contains(active) && active.dataset ? active.dataset.match : null;
+    var rack = board.querySelector('.mj-match-hand');
+    var rackScroll = rack ? rack.scrollLeft : 0;
     if (selected && (game.phase !== 'discard' || game.turn !== HUMAN ||
       selected.index >= game.hands[HUMAN].length ||
       game.hands[HUMAN][selected.index] !== selected.tile)) {
       selected = null;
     }
     if (game.phase === 'over') applySession();
-    $('mj-match-board').innerHTML = boardHTML();
+    board.innerHTML = boardHTML();
+    var nextRack = board.querySelector('.mj-match-hand');
+    if (nextRack) nextRack.scrollLeft = rackScroll;
+    var focusTarget = focusIndex != null ? board.querySelector('[data-hand-index="' + focusIndex + '"]:not(:disabled)') :
+      focusAction ? board.querySelector('[data-match="' + focusAction + '"]:not(:disabled)') : null;
+    if (focusTarget) focusTarget.focus({ preventScroll: true });
+    else if (hadBoardFocus) board.focus({ preventScroll: true });
     $('mj-match-status').textContent = statusText();
     $('mj-match-chips').innerHTML = chipsHTML();
     $('mj-match-log').innerHTML = logHTML();
@@ -354,6 +384,7 @@
 
   function schedule() {
     clearTimeout(timer);
+    if (!isActive()) return;
     if (!game || game.phase === 'over' || game.phase === 'claim-human') return;
     if (dice && dice.rolling) return;
     if (game.turn === HUMAN) return;
@@ -367,6 +398,7 @@
   }
 
   function aiStep() {
+    if (!isActive()) return;
     if (!game || game.phase === 'over' || game.phase === 'claim-human' || game.turn === HUMAN) return;
     if (dice && dice.rolling) return;
     if (game.phase !== 'discard') return;
@@ -394,7 +426,21 @@
       return;
     }
     render();
+    continueRoll();
     schedule();
+  }
+
+  function deactivate() {
+    clearTimeout(timer);
+    clearInterval(rollTimer);
+    rollTimer = null;
+  }
+
+  function discardSelected() {
+    if (!isActive() || !game || !selected || game.phase !== 'discard' || game.turn !== HUMAN || (dice && dice.rolling)) return;
+    var index = selected.index;
+    selected = null;
+    if (M.discard(game, index)) afterHuman();
   }
 
   function handleAction(button) {
@@ -406,6 +452,10 @@
     if (button.dataset.match === 'cancel') {
       selected = null;
       render();
+      return;
+    }
+    if (button.dataset.match === 'discard') {
+      discardSelected();
       return;
     }
     if (button.dataset.self === 'win') {
@@ -441,8 +491,7 @@
       if (game.phase !== 'discard' || game.turn !== HUMAN || (dice && dice.rolling)) return;
       var index = +hand.dataset.handIndex;
       if (selected && selected.index === index) {
-        selected = null;
-        if (M.discard(game, index)) afterHuman();
+        discardSelected();
         return;
       }
       selected = { index: index, tile: game.hands[HUMAN][index] };
@@ -456,8 +505,34 @@
   $('mj-match-next').addEventListener('click', nextHand);
   $('mj-match-reset').addEventListener('click', resetSession);
 
+  $('mj-match-board').tabIndex = -1;
+  $('mj-match-board').setAttribute('aria-label', '四人麻将牌桌');
+  $('mj-match-board').addEventListener('keydown', function (event) {
+    if (!isActive()) return;
+    if (event.key === 'Escape' && selected) {
+      event.preventDefault();
+      selected = null;
+      render();
+      return;
+    }
+    if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(event.key) < 0) return;
+    var tiles = Array.prototype.slice.call(this.querySelectorAll('.mj-match-hand-tile:not(:disabled)'));
+    if (!tiles.length || (event.target !== this && !event.target.matches('[data-hand-index]'))) return;
+    event.preventDefault();
+    var current = tiles.indexOf(document.activeElement);
+    var index = event.key === 'Home' ? 0 : event.key === 'End' ? tiles.length - 1 :
+      current < 0 ? 0 : (current + (event.key === 'ArrowLeft' ? tiles.length - 1 : 1)) % tiles.length;
+    tiles[index].focus({ preventScroll: true });
+    tiles[index].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) deactivate();
+    else if (!$('mj-panel-match').hidden) activate();
+  });
+
   window.MahjongMatchUI = {
     activate: activate,
+    deactivate: deactivate,
     updateBadge: updateBadge
   };
 })();

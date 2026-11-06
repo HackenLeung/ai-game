@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b3226">
+<meta name="theme-color" content="#edf3f2">
 <meta name="description" content="麻雀学堂：广东牌从拿牌、算番到筹码结算的互动教程，还能和三家电脑打一局 136 张四人对局。掷骰开门、听牌练习、番种与筹码记账，全部用真实麻将牌面演示。">
 <title>麻雀学堂 · 广东牌算番、筹码与对局</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b3226'/%3E%3Crect x='12' y='10' width='40' height='44' rx='6' fill='%23f6efdc'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='30' fill='%23b3352a' font-family='serif'%3E%E9%BA%BB%3C/text%3E%3C/svg%3E">
@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="mj-top-actions">
-      <label class="mj-field-inline">
+      <label class="mj-field-inline" id="mj-style-field">
         <span>玩法</span>
         <select id="mj-style">
           <option value="ghost" selected>鬼牌（百搭）</option>
@@ -34,22 +34,35 @@
   </header>
 
   <nav class="mj-tabs" role="tablist" aria-label="学堂分区">
-    <button class="mj-tab" id="tab-learn" role="tab" aria-selected="true" aria-controls="mj-panel-learn" data-tab="learn"><b>01</b><span>学 · 上手</span></button>
-    <button class="mj-tab" id="tab-draw" role="tab" aria-selected="false" aria-controls="mj-panel-draw" data-tab="draw"><b>02</b><span>拿牌 · 开局</span></button>
-    <button class="mj-tab" id="tab-score" role="tab" aria-selected="false" aria-controls="mj-panel-score" data-tab="score"><b>03</b><span>算番 · 番种</span></button>
-    <button class="mj-tab" id="tab-chips" role="tab" aria-selected="false" aria-controls="mj-panel-chips" data-tab="chips"><b>04</b><span>筹码 · 结算</span></button>
-    <button class="mj-tab" id="tab-match" role="tab" aria-selected="false" aria-controls="mj-panel-match" data-tab="match"><b>05</b><span>对局 · 四人麻将</span></button>
-    <button class="mj-tab" id="tab-drill" role="tab" aria-selected="false" aria-controls="mj-panel-drill" data-tab="drill"><b>06</b><span>练 · 胡牌与听牌</span></button>
+    <button class="mj-tab" id="tab-learn" role="tab" aria-selected="true" aria-controls="mj-panel-learn" data-tab="learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v15M12 5C9 3 5 3 3 4v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-2-1-6-1-9 1Z"/></svg><span>入门课堂</span></button>
+    <button class="mj-tab" id="tab-draw" role="tab" aria-selected="false" tabindex="-1" aria-controls="mj-panel-draw" data-tab="draw"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 8h.01M16 8h.01M12 12h.01M8 16h.01M16 16h.01" stroke-width="3"/></svg><span>掷骰拿牌</span></button>
+    <button class="mj-tab" id="tab-score" role="tab" aria-selected="false" tabindex="-1" aria-controls="mj-panel-score" data-tab="score"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 7h6M9 11h.01M15 11h.01M9 15h.01M15 15h.01M9 18h.01M15 18h.01"/></svg><span>摆牌算番</span></button>
+    <button class="mj-tab" id="tab-chips" role="tab" aria-selected="false" tabindex="-1" aria-controls="mj-panel-chips" data-tab="chips"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v5c0 4 16 4 16 0V6M4 11v6c0 4 16 4 16 0v-6"/></svg><span>筹码结算</span></button>
+    <button class="mj-tab" id="tab-match" role="tab" aria-selected="false" tabindex="-1" aria-controls="mj-panel-match" data-tab="match"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M10 8h4M12 6v9M10 13h4M4 7v10M20 7v10"/></svg><span>四人对局</span></button>
+    <button class="mj-tab" id="tab-drill" role="tab" aria-selected="false" tabindex="-1" aria-controls="mj-panel-drill" data-tab="drill"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span>听牌练习</span></button>
   </nav>
 
   <main class="mj-main">
 
     <!-- ============ 学 ============ -->
     <section class="mj-panel" id="mj-panel-learn" role="tabpanel" aria-labelledby="tab-learn">
-      <div class="mj-panel-head">
-        <p class="mj-eyebrow">零基础 · 七节课</p>
-        <h2>先把牌桌的规矩弄明白</h2>
-        <p class="mj-lede">广东牌和别的麻将最大的不同是<strong>三番起胡</strong>：牌型本身不一定有番，要靠番种凑够三番才能胡。先按顺序看完这七节，再去<strong>算番</strong>里点几手牌，比看十篇文章都快。</p>
+      <div class="mj-welcome">
+        <div class="mj-welcome-copy">
+          <p class="mj-eyebrow"><span class="mj-live-dot"></span> 广东麻将 · 从第一张牌开始</p>
+          <h2>一桌好牌，<br>从容开场<span>。</span></h2>
+          <p class="mj-lede">认牌、拿牌、算番，再和三位牌友切磋。<br>把牌桌上的门道，一手一手学会。</p>
+          <div class="mj-welcome-actions">
+            <button type="button" class="mj-btn mj-btn-primary" data-go="match">坐下打一局 <span aria-hidden="true">↗</span></button>
+            <button type="button" class="mj-btn mj-btn-ghost" data-go="score">试试摆牌算番 <span aria-hidden="true">→</span></button>
+          </div>
+          <p class="mj-welcome-note">无需下载 · 电脑陪练 · 随时开桌</p>
+        </div>
+        <div class="mj-welcome-art" id="mj-welcome-art" aria-hidden="true"></div>
+      </div>
+
+      <div class="mj-section-title">
+        <div><p class="mj-eyebrow">零基础 · 七节课</p><h3>从认牌到上桌</h3></div>
+        <span>展开课程，边看边学</span>
       </div>
 
       <div class="mj-lessons" id="mj-lessons"></div>
@@ -63,7 +76,7 @@
     </section>
 
     <!-- ============ 拿牌 ============ -->
-    <section class="mj-panel" id="mj-panel-draw" role="tabpanel" hidden>
+    <section class="mj-panel" id="mj-panel-draw" role="tabpanel" aria-labelledby="tab-draw" hidden>
       <div class="mj-panel-head">
         <p class="mj-eyebrow">开局 · 拿牌</p>
         <h2>掷完骰子，到底从谁家拿？</h2>
@@ -135,7 +148,7 @@
     </section>
 
     <!-- ============ 算番 ============ -->
-    <section class="mj-panel" id="mj-panel-score" role="tabpanel" hidden>
+    <section class="mj-panel" id="mj-panel-score" role="tabpanel" aria-labelledby="tab-score" hidden>
       <div class="mj-panel-head">
         <p class="mj-eyebrow">算番 · 番种</p>
         <h2>把牌摆上桌，看它值几番</h2>
@@ -349,16 +362,19 @@
     <section class="mj-panel" id="mj-panel-match" role="tabpanel" aria-labelledby="tab-match" hidden>
       <div class="mj-panel-head">
         <p class="mj-eyebrow">对局 · 四人麻将</p>
-        <h2>你和三家电脑打一局，首局坐东</h2>
-        <p class="mj-lede">首局你坐东；赢家下一局坐庄，座位风位跟着换。先摇骰子再开牌；点手牌会先立起来，再点一次才打出。136 张、无鬼无花；摸打、碰杠吃胡都能用，只按筹码结算，不算番、不抓马。</p>
-        <p class="mj-note">对局固定 136 张，不受顶部「玩法」影响；要算鬼牌或花牌，去「算番」「筹码」页。</p>
+        <h2>四方落座，好牌开场</h2>
+        <p class="mj-lede">你与三位电脑牌友同桌。点选手牌，再点「打出」；也可以再点一次牌面出牌。</p>
+        <div class="mj-match-toolbar">
+          <div class="mj-rule-tags"><span><i class="mj-live-dot"></i> 电脑陪练</span><span>136 张 · 无鬼无花</span><span>赢家坐庄</span></div>
+          <details class="mj-rules-help"><summary>玩法与快捷键 <span aria-hidden="true">⌄</span></summary><div><p>首局你坐东，庄家掷骰后先出牌。吃只能吃上家，碰、杠、胡按牌局提示操作。按筹码结算，不算番、不抓马；自摸每家付 2，出铳那家付 2。</p><p><kbd>←</kbd> <kbd>→</kbd> 移动手牌焦点 · <kbd>Enter</kbd> 选牌 / 再按出牌 · <kbd>Esc</kbd> 取消选牌。切换分区或离开页面时，对局自动暂停。</p></div></details>
+        </div>
       </div>
 
       <div class="mj-match-layout">
         <div class="mj-match-board" id="mj-match-board"></div>
         <aside class="mj-match-side">
           <div class="mj-card mj-match-status-card">
-            <p class="mj-card-title">牌局</p>
+            <p class="mj-card-title"><span class="mj-live-dot"></span> 当前牌局</p>
             <p class="mj-match-status" id="mj-match-status" aria-live="polite"></p>
           </div>
 
@@ -373,7 +389,7 @@
           </div>
 
           <div class="mj-card">
-            <p class="mj-card-title">记录</p>
+            <p class="mj-card-title">牌桌动态 <span>最近 12 条</span></p>
             <div class="mj-match-log" id="mj-match-log"></div>
           </div>
         </aside>
@@ -381,7 +397,7 @@
     </section>
 
     <!-- ============ 练 ============ -->
-    <section class="mj-panel" id="mj-panel-drill" role="tabpanel" hidden>
+    <section class="mj-panel" id="mj-panel-drill" role="tabpanel" aria-labelledby="tab-drill" hidden>
       <div class="mj-panel-head">
         <p class="mj-eyebrow">练 · 每天五分钟</p>
         <h2>先会看胡牌，再会算番</h2>
@@ -411,7 +427,7 @@
   </main>
 
   <footer class="mj-footer">
-    <span>牌面为矢量绘制，离线可用</span>
+    <span>麻雀学堂 · 一手一手，慢慢学会</span>
     <span class="mj-footer-dot">·</span>
     <span>按常见广东牌（旧章 · 三番起胡）整理</span>
   </footer>

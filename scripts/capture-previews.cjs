@@ -19,12 +19,8 @@ const browserTools = require('./browser-tools.cjs');
       await page.locator('.enemy').first().waitFor();
     }
     if (game.id === 'mahjong') {
-      // 封面用一张已经算好的清一色对对胡。
-      await page.locator('.mj-tab[data-tab="score"]').click();
-      for (const id of [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4]) {
-        await page.locator(`#mj-picker button[data-tile="${id}"]`).click();
-      }
-      await page.locator('#mj-f-dealer').check();
+      await page.locator('.mj-tab[data-tab="match"]').click();
+      await page.locator('#mj-match-status').filter({ hasText: '你的回合' }).waitFor();
     }
   }
   async function cover(page, game, target) {
@@ -34,9 +30,7 @@ const browserTools = require('./browser-tools.cjs');
       return;
     }
     if (game.id === 'mahjong') {
-      // 牌桌适合横向构图：直接取当前视口，保留牌墙、手牌、印章与账本。
-      await page.evaluate(() => window.scrollTo(0, 96));
-      await page.screenshot({ path: target, animations: 'disabled' });
+      await page.locator('#mj-match-board').screenshot({ path: target, animations: 'disabled' });
       return;
     }
     const selector = game.id === 'abyss' ? '.view-battle' : '.landscape';
