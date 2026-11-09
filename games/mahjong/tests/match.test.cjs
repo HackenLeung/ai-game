@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const match = require('../match.js');
+const rules = require('../rules.js');
 
 const SAFE13 = [0, 4, 8, 9, 13, 17, 18, 22, 26, 28, 29, 30, 31];
 
@@ -247,4 +248,134 @@ test('牌墙摸完流局', () => {
   assert.equal(state.phase, 'over');
   assert.equal(state.winner, null);
   assert.equal(state.winInfo.draw, true);
+});
+
+test('骰子决定开门方位与拿牌起点，牌墙按面/墩记录', () => {
+  const state = match.createGame({
+    dealer: 0, human: 0, dice: { a: 3, b: 5 }, mode: 'bigPerson', stackMode: 'next'
+  });
+  assert.equal(state.open.persons, 5);
+  assert.equal(state.open.stacks, 3);
+  assert.equal(state.deal.breakOwner, 0);
+  assert.equal(state.deal.breakStack, 4);
+  assert.equal(state.wall.length, 83);
+  assert.equal(state.wallSlots.length, 136);
+  assert.equal(state.wallSlots.filter((slot) => slot.taken).length, 53);
+
+  const owners = new Set(state.wallSlots.map((slot) => slot.owner));
+  assert.equal(owners.size, 4);
+  state.wallSlots.forEach((slot) => {
+    assert.ok(slot.stack >= 1 && slot.stack <= 17);
+    assert.ok(slot.layer === 0 || slot.layer === 1);
+    assert.ok(slot.tile >= 0 && slot.tile < 34);
+  });
+
+  assert.equal(state.wall[state.wall.length - 1].owner, 3);
+  assert.equal(state.wall[state.wall.length - 1].stack, 16);
+  assert.equal(state.wall[state.wall.length - 1].layer, 0);
+  assert.equal(state.lastDrawSlot.stack, 13);
+  assert.equal(state.lastDrawSlot.layer, 0);
+  assert.match(match.slotText(state, state.lastDrawSlot), /^北位牌墙第 13 墩上层$/);
+});
+
+test('跳牌剩下的五张下层牌留到牌墙尾', () => {
+  const state = match.createGame({
+    dealer: 0, human: 0, dice: { a: 3, b: 5 }, mode: 'bigPerson', stackMode: 'next'
+  });
+  const tail = state.wall.slice(0, 5);
+  assert.equal(tail.length, 5);
+  assert.ok(tail.every((slot) => slot.layer === 1 && !slot.taken));
+});
+
+test('同一门点数相加时使用第三粒骰子', () => {
+  const state = match.createGame({
+    dealer: 0, human: 0, dice: { a: 2, b: 3, c: 6 }, mode: 'sum', stackMode: 'next'
+  });
+  assert.equal(state.roll.total, 11);
+  assert.equal(state.open.persons, 11);
+  assert.equal(state.open.stacks, 11);
+  assert.equal(state.deal.breakStack, 12);
+  assert.equal(state.wall.length, 83);
+});
+
+test('记录最后摸牌的人，非庄家不会错误显示起手摸牌', () => {
+  const dealerState = match.createGame({ dealer: 1, human: 0, dice: { a: 2, b: 2 } });
+  assert.equal(dealerState.lastDrawPlayer, 1);
+  assert.equal(dealerState.hands[0].length, 13);
+  assert.equal(dealerState.hands[1].length, 14);
+
+  dealerState.phase = 'discard';
+  dealerState.turn = 1;
+  match.discard(dealerState, 0);
+  assert.notEqual(dealerState.lastDrawPlayer, 0, '庄家出牌后不能把起手跳牌算成人的摸牌');
+});
+
+test('鬼牌玩法：红中能补顺子，不能做眼或杠', () => {
+  assert.equal(match.styleLabel('ghost'), '鬼牌 · 红中');
+  assert.equal(match.ghostIdFor('ghostWhite'), 33);
+  assert.equal(match.ghostIdFor('none'), -1);
+
+  const state = match.createGame({ dealer: 0, human: 0, style: 'ghost', dice: { a: 1, b: 1 } });
+  assert.equal(state.style, 'ghost');
+  assert.equal(state.ghostId, 31);
+
+  state.hands[0] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 31, 27, 27];
+  state.turn = 0;
+  state.phase = 'discard';
+  state.lastDraw = 31;
+  assert.equal(match.canSelfWin(state), true, '红中补 1/2/3 筒成顺子');
+
+  state.hands[0] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 31, 31];
+  state.lastDraw = 31;
+  assert.equal(match.canSelfWin(state), false, '两张鬼牌不能做眼');
+
+  state.hands[0] = [31, 31, 31, 31, 0, 1, 2, 3, 4, 5, 6, 7, 8, 27];
+  state.lastDraw = 31;
+  assert.equal(match.selfKongOptions(state).some((option) => option.tile === 31), false);
+});
+
+test('鬼牌弃张不能被碰或杠', () => {
+  const state = match.createGame({ dealer: 0, human: -1, style: 'ghost', dice: { a: 1, b: 1 } });
+  state.hands[0] = [31, 1, 5, 9, 13, 17, 21, 25, 28, 29, 30, 32, 33, 2];
+  state.hands[1] = [31, 31, 31, 0, 4, 8, 12, 16, 20, 24, 28, 29, 30];
+  state.hands[2] = [3, 7, 11, 15, 19, 23, 27, 32, 33, 1, 5, 9, 13];
+  state.hands[3] = [6, 10, 14, 18, 22, 26, 28, 29, 30, 32, 33, 1, 5];
+  state.turn = 0;
+  state.phase = 'discard';
+
+  assert.equal(match.discard(state, state.hands[0].indexOf(31)), true);
+  assert.equal(state.melds[1].length, 0, '三张鬼牌不能碰鬼牌弃张');
+  assert.equal(state.phase, 'discard');
+  assert.ok(state.discards[0].includes(31));
+});
+
+test('电脑摸牌日志只报位置，不显示牌面', () => {
+  const state = match.createGame({ dealer: 0, human: 0, style: 'ghost', dice: { a: 1, b: 1 } });
+  state.turn = 0;
+  state.phase = 'discard';
+  state.hands[0] = [0, 4, 8, 9, 13, 17, 18, 22, 26, 27, 28, 29, 30, 31];
+  state.hands[1] = [3, 4, 8, 9, 13, 17, 18, 22, 26, 28, 29, 32, 33];
+  state.hands[2] = [3, 4, 8, 9, 13, 17, 18, 22, 26, 28, 29, 32, 33];
+  state.hands[3] = [3, 4, 8, 9, 13, 17, 18, 22, 26, 28, 29, 32, 33];
+  state.lastDraw = 31;
+
+  assert.equal(match.discard(state, state.hands[0].indexOf(0)), true);
+  assert.equal(state.turn, 1);
+  assert.equal(state.phase, 'discard');
+  const line = state.log[state.log.length - 1];
+  assert.match(line, /^下家 摸牌（.+位牌墙第 \d+ 墩(上层|下层)）$/);
+  assert.equal(line.includes('摸牌 ' + rules.name(state.lastDraw)), false, '不能显示下家摸到的牌');
+});
+
+test('手牌提示会给出建议牌、索引和原因', () => {
+  const state = match.createGame({ dealer: 0, human: 0, dice: { a: 1, b: 1 } });
+  const hint = match.handHint(state, 0);
+  assert.ok(hint);
+  assert.ok(hint.index >= 0 && hint.index < state.hands[0].length);
+  assert.equal(state.hands[0][hint.index], hint.tile);
+  assert.ok(hint.reason.length > 4);
+  assert.ok(hint.options.length >= 1 && hint.options.length <= 3);
+
+  state.turn = 1;
+  assert.equal(match.handHint(state, 0), null, '不是自己的回合时不给提示');
 });

@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="mj-app" id="mj-app">
+<div class="mj-app is-compact" id="mj-app">
 
   <header class="mj-top">
     <div class="mj-brand">
@@ -62,7 +62,7 @@
 
       <div class="mj-section-title">
         <div><p class="mj-eyebrow">零基础 · 七节课</p><h3>从认牌到上桌</h3></div>
-        <span>展开课程，边看边学</span>
+        <span>点开课程，弹窗细读</span>
       </div>
 
       <div class="mj-lessons" id="mj-lessons"></div>
@@ -80,7 +80,7 @@
       <div class="mj-panel-head">
         <p class="mj-eyebrow">开局 · 拿牌</p>
         <h2>掷完骰子，到底从谁家拿？</h2>
-        <p class="mj-lede">选数法、骰子点数和座位，下面会算出开门方位、从第几墩开始，以及每个人拿几张。</p>
+        <p class="mj-lede">选数法、骰子点数和座位，下面会算出开门方位、从第几墩开始，以及每个人拿几张。四人对局页沿用这里的数法与拿牌起点，改这边，对局下一局同步。</p>
       </div>
 
       <div class="mj-card">
@@ -90,7 +90,7 @@
             <select id="mj-mode">
               <option value="bigPerson" selected>分大小：大数数人、小数数墩</option>
               <option value="smallPerson">分大小：小数数人、大数数墩</option>
-              <option value="sum">两粒相加</option>
+              <option value="sum">相加（两粒/三粒）</option>
             </select>
           </label>
           <label class="mj-field"><span>第一粒骰</span><select id="mj-die1"></select></label>
@@ -144,6 +144,7 @@
         </div>
 
         <ol class="mj-steps" id="mj-draw-steps"></ol>
+        <p class="mj-draw-note">四人对局页沿用这里的骰子数法与开门起点；改完回对局页，重开一局就生效。</p>
       </div>
     </section>
 
@@ -189,7 +190,7 @@
                   <option value="3">北位</option>
                 </select>
               </label>
-              <label class="mj-field" id="mj-ghost-field"><span>鬼牌是哪张</span>
+              <label class="mj-field" id="mj-ghost-field" title="鬼牌不能碰杠、不能做眼，只能补顺子或刻子；手里的鬼牌自动当万能牌拆牌，不计番。"><span>鬼牌是哪张</span>
                 <select id="mj-ghost">
                   <option value="31" selected>红中</option>
                   <option value="33">白板</option>
@@ -278,7 +279,7 @@
 
       <div class="mj-score-layout">
         <div class="mj-score-main">
-          <div class="mj-card">
+          <div class="mj-card mj-chips-deal-card">
             <p class="mj-card-title">这一把</p>
             <div class="mj-form-grid">
               <label class="mj-field"><span>本把庄家（东）</span><select id="mj-chip-dealer"></select></label>
@@ -314,7 +315,7 @@
             <p class="mj-chip-ma-hits" id="mj-chip-ma-hits"></p>
           </div>
 
-          <div class="mj-card">
+          <div class="mj-card mj-chips-kong-card">
             <p class="mj-card-title">台面杠</p>
             <div class="mj-kong-list" id="mj-chip-kongs"></div>
             <p class="mj-note">前两列填自己杠了几次：公杠（补杠）三家各付 1 个，暗杠三家各付 2 个。后两列填自己打出的牌被别人杠：只有放杠那家付 3 个。没有杠就都留 0。</p>
@@ -363,10 +364,18 @@
       <div class="mj-panel-head">
         <p class="mj-eyebrow">对局 · 四人麻将</p>
         <h2>四方落座，好牌开场</h2>
-        <p class="mj-lede">你与三位电脑牌友同桌。点选手牌，再点「打出」；也可以再点一次牌面出牌。</p>
+        <p class="mj-lede">庄家摇骰子决定从谁家、第几墩开门，再按逆时针发牌。中间牌河收四家弃牌；点手牌出牌，拿不准可以按「提示」。</p>
         <div class="mj-match-toolbar">
-          <div class="mj-rule-tags"><span><i class="mj-live-dot"></i> 电脑陪练</span><span>136 张 · 无鬼无花</span><span>赢家坐庄</span></div>
-          <details class="mj-rules-help"><summary>玩法与快捷键 <span aria-hidden="true">⌄</span></summary><div><p>首局你坐东，庄家掷骰后先出牌。吃只能吃上家，碰、杠、胡按牌局提示操作。按筹码结算，不算番、不抓马；自摸每家付 2，出铳那家付 2。</p><p><kbd>←</kbd> <kbd>→</kbd> 移动手牌焦点 · <kbd>Enter</kbd> 选牌 / 再按出牌 · <kbd>Esc</kbd> 取消选牌。切换分区或离开页面时，对局自动暂停。</p></div></details>
+          <div class="mj-rule-tags"><span><i class="mj-live-dot"></i> 电脑陪练</span><span id="mj-match-style-tag">136 张 · 鬼牌 · 红中</span><span>骰子开门</span><span>赢家坐庄</span></div>
+          <label class="mj-field-inline mj-match-style"><span>玩法</span>
+            <select id="mj-match-style" aria-label="对局玩法">
+              <option value="ghost" selected>鬼牌 · 红中</option>
+              <option value="ghostWhite">鬼牌 · 白板</option>
+              <option value="ghostGreen">鬼牌 · 发财</option>
+              <option value="none">无鬼无花</option>
+            </select>
+          </label>
+          <details class="mj-rules-help"><summary>玩法与快捷键 <span aria-hidden="true">⌄</span></summary><div><p>首局你坐东。庄家掷骰后，先从庄家起逆时针数点数找开门方位，再从那一面牌墙右端数墩，按数法从下一墩或同一墩开始拿。发牌按逆时针每家 4 张拿三轮，庄家跳牌 2 张、其余三家各 1 张。</p><p>默认鬼牌：红中当万能牌，能补顺子或刻子，<strong>不能碰、不能杠、不能做眼</strong>；摸到鬼牌直接留在手里，不计番。右上角可换成白板、发财，或切到无鬼无花。改动从下一局或「重开本局」生效。</p><p>牌墙图上的金框是开门位置，亮色是下一张要摸的墩；中间牌河上=对家、下=你、左=上家、右=下家，亮框是最新弃牌。电脑摸牌只报位置，不显示牌面。</p><p>吃只能吃上家，碰、杠、胡按牌局提示操作。按筹码结算，不算番、不抓马；自摸每家付 2，出铳那家付 2。</p><p><kbd>←</kbd> <kbd>→</kbd> 移动手牌焦点 · <kbd>Enter</kbd> 选牌 / 再按出牌 · <kbd>H</kbd> 提示打哪张 · <kbd>Esc</kbd> 取消选牌。切换分区或离开页面时，对局自动暂停。</p></div></details>
         </div>
       </div>
 
@@ -376,9 +385,34 @@
           <div class="mj-card mj-match-status-card">
             <p class="mj-card-title"><span class="mj-live-dot"></span> 当前牌局</p>
             <p class="mj-match-status" id="mj-match-status" aria-live="polite"></p>
+            <div class="mj-match-tip-wrap" id="mj-match-tip"></div>
           </div>
 
-          <div class="mj-card">
+          <div class="mj-card mj-match-teach-card">
+            <p class="mj-card-title">这把怎么开 <span>摸牌从哪来</span></p>
+            <div class="mj-match-setup">
+              <label class="mj-field"><span>骰子数法</span>
+                <select id="mj-match-mode">
+                  <option value="bigPerson" selected>分大小：大数数人、小数数墩</option>
+                  <option value="smallPerson">分大小：小数数人、大数数墩</option>
+                  <option value="sum">相加（两粒/三粒）</option>
+                </select>
+              </label>
+              <label class="mj-field"><span>从哪一墩开始拿</span>
+                <select id="mj-match-stack">
+                  <option value="next" selected>从下一墩开始（常见）</option>
+                  <option value="same">从数到的那一墩开始</option>
+                </select>
+              </label>
+            </div>
+            <p class="mj-match-rule-note" id="mj-match-rule-note"></p>
+            <details class="mj-match-steps-details">
+              <summary>展开开局 6 步 <span aria-hidden="true">⌄</span></summary>
+              <ol class="mj-match-steps" id="mj-match-open"></ol>
+            </details>
+          </div>
+
+          <div class="mj-card mj-match-chips-card">
             <p class="mj-card-title">筹码 <span id="mj-match-hand-no"></span></p>
             <div class="mj-match-chips" id="mj-match-chips"></div>
             <p class="mj-note">自摸每家 2，出铳那家 2；公杠每家 1，暗杠每家 2，放杠 3。对局不收马。</p>
@@ -388,8 +422,8 @@
             </div>
           </div>
 
-          <div class="mj-card">
-            <p class="mj-card-title">牌桌动态 <span>最近 12 条</span></p>
+          <div class="mj-card mj-match-log-card">
+            <p class="mj-card-title">牌桌动态 <span>最近 3 条</span></p>
             <div class="mj-match-log" id="mj-match-log"></div>
           </div>
         </aside>
@@ -425,6 +459,18 @@
     </section>
 
   </main>
+
+  <dialog class="mj-lesson-modal" id="mj-lesson-modal" aria-labelledby="mj-lesson-modal-title">
+    <div class="mj-lesson-modal-head">
+      <div>
+        <p class="mj-eyebrow" id="mj-lesson-modal-no"></p>
+        <h3 id="mj-lesson-modal-title"></h3>
+        <p class="mj-lesson-modal-sum" id="mj-lesson-modal-sum"></p>
+      </div>
+      <button type="button" class="mj-lesson-modal-close" id="mj-lesson-modal-close" aria-label="关闭课程">×</button>
+    </div>
+    <div class="mj-lesson-modal-body mj-lesson-body" id="mj-lesson-modal-body" tabindex="0"></div>
+  </dialog>
 
   <footer class="mj-footer">
     <span>麻雀学堂 · 一手一手，慢慢学会</span>

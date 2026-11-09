@@ -24,6 +24,8 @@
   function activate(name) {
     if (state.tab === 'match' && name !== 'match' && window.MahjongMatchUI) window.MahjongMatchUI.deactivate();
     state.tab = name;
+    var app = $('mj-app');
+    if (app) app.classList.toggle('is-match', name === 'match');
     $('mj-style-field').hidden = name === 'match';
     tabs.forEach(function (tab) {
       var on = tab.dataset.tab === name;
@@ -64,21 +66,21 @@
   });
 
   /* ================= 课程 ================= */
+  function lessonTilesHTML(lesson) {
+    if (!lesson.tiles.length) return '';
+    return '<div class="mj-lesson-tiles">' + lesson.tiles.map(function (id) {
+      return '<span class="mj-tile mj-tile-xs">' + T.svg(id) + '</span>';
+    }).join('') + '</div>';
+  }
+
   function renderLessons() {
     $('mj-lessons').innerHTML = D.lessons.map(function (lesson, i) {
-      var tiles = lesson.tiles.length
-        ? '<div class="mj-lesson-tiles">' + lesson.tiles.map(function (id) {
-          return '<span class="mj-tile mj-tile-xs">' + T.svg(id) + '</span>';
-        }).join('') + '</div>'
-        : '';
-      return '<details class="mj-lesson"' + (i === 0 ? ' open' : '') + '>' +
-        '<summary>' +
+      return '<button type="button" class="mj-lesson" data-lesson="' + i + '" aria-haspopup="dialog" aria-controls="mj-lesson-modal">' +
         '<span class="mj-lesson-no">' + lesson.no + '</span>' +
         '<span class="mj-lesson-title">' + lesson.title + '</span>' +
         '<span class="mj-lesson-sum">' + lesson.summary + '</span>' +
-        '</summary>' +
-        '<div class="mj-lesson-body">' + lesson.body + tiles + '</div>' +
-        '</details>';
+        '<span class="mj-lesson-open" aria-hidden="true">+</span>' +
+        '</button>';
     }).join('');
 
     $('mj-glossary').innerHTML = D.glossary.map(function (pair) {
@@ -86,9 +88,46 @@
     }).join('');
   }
 
+  var lessonDialog = $('mj-lesson-modal');
+  var lessonTrigger = null;
+
+  function openLesson(index, trigger) {
+    var lesson = D.lessons[index];
+    if (!lesson || !lessonDialog || lessonDialog.open) return;
+    lessonTrigger = trigger || null;
+    $('mj-lesson-modal-no').textContent = '第 ' + lesson.no + ' 课';
+    $('mj-lesson-modal-title').textContent = lesson.title;
+    $('mj-lesson-modal-sum').textContent = lesson.summary;
+    $('mj-lesson-modal-body').innerHTML = lesson.body + lessonTilesHTML(lesson);
+    if (typeof lessonDialog.showModal === 'function') lessonDialog.showModal();
+    else lessonDialog.setAttribute('open', '');
+  }
+
+  function closeLesson() {
+    if (!lessonDialog) return;
+    if (typeof lessonDialog.close === 'function') lessonDialog.close();
+    else lessonDialog.removeAttribute('open');
+  }
+
+  $('mj-lessons').addEventListener('click', function (event) {
+    var button = event.target.closest('button[data-lesson]');
+    if (!button) return;
+    openLesson(+button.dataset.lesson, button);
+  });
+  $('mj-lesson-modal-close').addEventListener('click', closeLesson);
+  if (lessonDialog) {
+    lessonDialog.addEventListener('click', function (event) {
+      if (event.target === lessonDialog) closeLesson();
+    });
+    lessonDialog.addEventListener('close', function () {
+      if (lessonTrigger) lessonTrigger.focus({ preventScroll: true });
+      lessonTrigger = null;
+    });
+  }
+
   function renderFanTable() {
     $('mj-fan-table').innerHTML = D.fanTable.map(function (row) {
-      return '<div class="mj-fan-item"><span class="n">' + row.name + '</span><span class="d">' + row.note + '</span><span class="v">' + row.fan + '</span></div>';
+      return '<div class="mj-fan-item" title="' + row.note + '"><span class="n">' + row.name + '</span><span class="d">' + row.note + '</span><span class="v">' + row.fan + '</span></div>';
     }).join('');
   }
 
