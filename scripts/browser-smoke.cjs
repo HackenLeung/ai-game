@@ -6,12 +6,14 @@ const { pathToFileURL } = require('node:url');
 const { createServer } = require('./serve.cjs');
 const { ROOT } = require('./site-files.cjs');
 const browserTools = require('./browser-tools.cjs');
+const catalog = require('../hall/catalog.js');
 const output = path.join(ROOT, 'test-results');
 const SAVE = 'youjian-library-v1';
 const EMBER = 'ember-wilderness-save-v1';
 const SWORD = 'wandering-sword-v1';
 const ABYSS = 'abyss-echo-save-v1';
-const TOTAL_GAMES = 4;
+const MINESWEEPER = 'minesweeper-save-v1';
+const TOTAL_GAMES = catalog.games.length;
 
 async function abyssFitsViewport(frame, label) {
   const layout = await frame.locator('body').evaluate(() => {
@@ -109,8 +111,10 @@ async function readSave(frame, key) {
     await page.locator('#search').fill('风云诀');
     assert.equal(await page.locator('.game-card').count(), 1);
     assert.equal(await page.locator('.game-card').getAttribute('data-game'), 'fengyunjue');
-    await page.locator('#search').fill('爬塔');
+    await page.locator('#search').fill('深渊');
     assert.equal(await page.locator('.game-card').getAttribute('data-game'), 'abyss');
+    await page.locator('#search').fill('扫雷');
+    assert.equal(await page.locator('.game-card').getAttribute('data-game'), 'minesweeper');
     await page.locator('#search').fill('不存在的世界');
     assert.equal(await page.locator('#empty-state').isVisible(), true);
     await page.locator('#reset-filters').click();
@@ -277,10 +281,17 @@ async function readSave(frame, key) {
     assert.match(await mahjong.locator('#mj-ledger').textContent(), /鬼牌 ×2/);
     assert.match(await mahjong.locator('#mj-ledger').textContent(), /不计番/);
     // 花牌模式切换后出现花牌选项
-    await mahjong.locator('#mj-style').selectOption('flower');
+    // 桌面一屏布局会隐藏顶部设置栏（#mj-style），直接改值再派发 change，别依赖可见性。
+    await mahjong.locator('#mj-style').evaluate((select) => {
+      select.value = 'flower';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
     assert.equal(await mahjong.locator('#mj-flower-field').isVisible(), true);
     assert.equal(await mahjong.locator('#mj-ghost-field').isVisible(), false);
-    await mahjong.locator('#mj-style').selectOption('ghost');
+    await mahjong.locator('#mj-style').evaluate((select) => {
+      select.value = 'ghost';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
     // 拿牌：分大小 3/5，大数数人 -> 第 4 墩
     await mahjong.locator('.mj-tab[data-tab="draw"]').click();
     await mahjong.locator('#mj-mode').selectOption('bigPerson');
@@ -337,6 +348,42 @@ async function readSave(frame, key) {
     await page.screenshot({ path: path.join(output, 'mahjong-player-desktop.png'), fullPage: true });
     await page.getByRole('link', { name: '返回大厅', exact: true }).click();
     console.log('PASS 麻雀学堂算番、筹码试算、四人对局、鬼牌、花牌切换与拿牌计算');
+
+    await page.getByRole('link', { name: '开始游玩静雷', exact: true }).click();
+    let mines = await gameFrame(page);
+    await mines.locator('#board .ms-cell').first().waitFor();
+    for (const size of [{ width: 1440, height: 1050 }, { width: 1024, height: 768 }]) {
+      await page.setViewportSize(size);
+      await noOverflow(page, `${size.width}×${size.height} 静雷外壳`);
+      assert.equal(await mines.locator('body').evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, '静雷不横向溢出');
+    }
+    await page.setViewportSize({ width: 1440, height: 1050 });
+    assert.equal(await mines.locator('#board .ms-cell').count(), 81, '初级 9 × 9');
+    await mines.locator('#board .ms-cell').nth(40).click();
+    if (/进行中/.test(await mines.locator('#status-text').textContent())) {
+      const before = Number(await mines.locator('#mines-left').textContent());
+      await mines.locator('#board .ms-cell:not(.is-open)').first().click({ button: 'right' });
+      assert.equal(Number(await mines.locator('#mines-left').textContent()), before - 1, '右键插旗会减少剩余雷数');
+      await mines.locator('[data-level="intermediate"]').click();
+      await mines.locator('#confirm-dialog[open]').waitFor();
+      await mines.locator('#confirm-cancel').click();
+      assert.equal(await mines.locator('#board .ms-cell').count(), 81, '取消切换会保留当前棋盘');
+    }
+    await mines.locator('[data-level="intermediate"]').click();
+    if (await mines.locator('#confirm-dialog[open]').count()) await mines.locator('#confirm-ok').click();
+    await mines.locator('#board .ms-cell').first().waitFor();
+    assert.equal(await mines.locator('#board .ms-cell').count(), 256, '中级 16 × 16');
+    await mines.locator('#board .ms-cell').nth(136).click();
+    const mineSave = await readSave(mines, MINESWEEPER);
+    assert.equal(mineSave.level, 'intermediate');
+    assert.equal(mineSave.game.rows, 16);
+    await page.reload();
+    mines = await gameFrame(page);
+    await mines.locator('#board .ms-cell').first().waitFor();
+    assert.equal(await mines.locator('#board .ms-cell').count(), 256, '刷新后继续中级棋盘');
+    await page.screenshot({ path: path.join(output, 'minesweeper-player-desktop.png'), fullPage: true });
+    await page.getByRole('link', { name: '返回大厅', exact: true }).click();
+    console.log('PASS 静雷尺寸切换、插旗、自动存档与刷新续玩');
     await page.getByRole('link', { name: '开始游玩逸剑风云决', exact: true }).click();
     let sword = await gameFrame(page);
     await sword.locator('#world').waitFor();
@@ -375,9 +422,9 @@ async function readSave(frame, key) {
     assert.equal(await page.locator('.game-card').first().getAttribute('data-game'), 'fengyunjue');
     const history = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), SAVE);
     assert.deepEqual(history.favorites, ['jihuan']);
-    assert.equal(Object.keys(history.recent).length, TOTAL_GAMES);
+    for (const id of ['fengyunjue', 'jihuan', 'abyss', 'mahjong', 'minesweeper']) assert.ok(history.recent[id], `recent ${id}`);
     assert.ok(history.recent.fengyunjue.plays >= 2);
-    console.log('PASS 逸剑背包、手动存档、重载续玩及四款游戏存档隔离');
+    console.log('PASS 逸剑背包、手动存档、重载续玩及五款游戏存档隔离');
 
 
     const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1, reducedMotion: 'reduce' });
@@ -437,8 +484,30 @@ async function readSave(frame, key) {
     }
     await mobile.setViewportSize({ width: 390, height: 844 });
     await mobile.screenshot({ path: path.join(output, 'mahjong-player-mobile.png'), fullPage: true });
+    await mobile.getByRole('link', { name: '返回大厅', exact: true }).click();
+    await mobile.getByRole('link', { name: '开始游玩静雷', exact: true }).click();
+    const mobileMines = await gameFrame(mobile);
+    await mobileMines.locator('#board .ms-cell').first().waitFor();
+    for (const width of [320, 390]) {
+      await mobile.setViewportSize({ width, height: 844 });
+      await mobile.waitForTimeout(250);
+      assert.equal(await mobileMines.locator('body').evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, `${width}×844 静雷不横向溢出`);
+    }
+    await mobile.setViewportSize({ width: 390, height: 844 });
+    await mobileMines.locator('#board .ms-cell').nth(40).click();
+    await mobile.waitForTimeout(200);
+    if (/进行中/.test(await mobileMines.locator('#status-text').textContent())) {
+      const flagBefore = Number(await mobileMines.locator('#mines-left').textContent());
+      const flagTarget = mobileMines.locator('#board .ms-cell:not(.is-open)').first();
+      await flagTarget.dispatchEvent('pointerdown', { pointerType: 'touch', button: 0, isPrimary: true });
+      await mobile.waitForTimeout(600);
+      await flagTarget.dispatchEvent('pointerup', { pointerType: 'touch', button: 0, isPrimary: true });
+      await mobile.waitForTimeout(120);
+      assert.equal(Number(await mobileMines.locator('#mines-left').textContent()), flagBefore - 1, '长按插旗');
+    }
+    await mobile.screenshot({ path: path.join(output, 'minesweeper-player-mobile.png'), fullPage: true });
     await mobileContext.close();
-    console.log('PASS 320–1440 像素布局、手机收藏以及四款游戏触屏操作');
+    console.log('PASS 320–1440 像素布局、手机收藏以及五款游戏触屏操作');
 
     const blockedContext = await browser.newContext();
     await blockedContext.addInitScript(() => Object.defineProperty(window, 'localStorage', { configurable: true, get() { throw new Error('Storage unavailable'); } }));
@@ -529,7 +598,7 @@ async function readSave(frame, key) {
     await page.goto(base);
     await page.getByRole('button', { name: '随便玩一个', exact: true }).click();
     await gameFrame(page);
-    assert.match(page.url(), /play\.html\?game=(?:fengyunjue|jihuan|abyss|mahjong)$/);
+    assert.match(page.url(), /play\.html\?game=(?:fengyunjue|jihuan|abyss|mahjong|minesweeper|mota)$/);
     console.log('PASS 子目录部署、直接打开 HTML、随机游玩');
     assert.deepEqual(errors, [], 'browser console and runtime must remain clean');
     console.log(`浏览器验证全部通过。截图：${output}`);

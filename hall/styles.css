@@ -124,6 +124,54 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible), summary:focus:not
 .abyss { background: #0a0e14; }
 .abyss .hero-shade { background: linear-gradient(90deg, #0a1220 0%, #0a1220f2 24%, #0a1220ba 46%, #0a122012 78%), linear-gradient(0deg, #071018f0 0%, transparent 45%, #07101818 100%); }
 .abyss .card-category { background: #0d2230c4; color: #cfeaf7; }
+/* 魔塔：纸面与墨线，把精选位也换成图纸的底色 */
+.ink { background: #edeee8; color: #16171a; border-color: rgba(22, 23, 26, .14); box-shadow: 0 14px 40px rgba(20, 23, 26, .16); }
+.ink .hero-image { opacity: .95; }
+.ink .hero-shade { background: linear-gradient(90deg, #edeee8 0%, #edeee8f7 20%, #edeee8c4 44%, #edeee818 80%), linear-gradient(0deg, #edeee8fa 0%, transparent 44%); }
+.ink .scene-caption { color: #3c3f3c; background: rgba(247, 248, 243, .72); border-color: rgba(22, 23, 26, .1); }
+.ink .feature-label { color: #7c5a12; background: rgba(247, 248, 243, .74); border-color: rgba(157, 119, 34, .26); }
+.ink .feature-label > span:first-child { background: #b23b2a; box-shadow: none; }
+.ink .label-line { background: rgba(22, 23, 26, .18); }
+.ink .hero-english { color: #83877f; }
+.featured.ink h2 { color: #f3f4ec; text-shadow: none; }
+.ink .hero-subtitle { color: #7c5a12; }
+.ink .hero-description { color: #3c3f3c; text-shadow: none; }
+.ink .hero-play { color: #f5f6f1; background: #16171a; box-shadow: 0 4px 16px rgba(20, 23, 26, .22); }
+.ink .hero-play:hover { background: #33362f; box-shadow: 0 8px 22px rgba(20, 23, 26, .28); }
+.ink .hero-detail { color: #52554f; }
+.ink .hero-detail:hover { color: #16171a; }
+.ink .featured-bottom { border-top-color: rgba(22, 23, 26, .14); }
+.ink .feature-tab { color: #7a7d75; }
+.ink .feature-tab-number { color: #a0a39a; }
+.ink .feature-tab:hover { color: #33362f; }
+.ink .feature-tab.active { color: #16171a; }
+.ink .feature-tab.active .feature-tab-number { color: #b23b2a; }
+.ink .feature-tab.active i { background: #b23b2a; box-shadow: none; }
+.ink .featured-note { color: rgba(22, 23, 26, .45); }
+.ink .card-category { background: rgba(245, 246, 241, .9); color: #2a2d28; border: 1px solid rgba(22, 23, 26, .08); }
+.ink .card-visual { background: #e6e7e1; }
+
+/* 游戏本身是深色的，精选位也跟着深下来，封面才不会被浅色蒙层洗白 */
+.featured.ink { background: #14181a; color: #eceee7; border-color: rgba(236, 238, 231, .16); box-shadow: 0 18px 44px -26px rgba(8, 10, 11, .9); }
+.featured.ink .hero-image { opacity: .96; }
+.featured.ink .hero-shade { background: linear-gradient(90deg, #14181a 0%, #14181af7 22%, #14181ac6 46%, #14181a14 82%), linear-gradient(0deg, #14181af5 0%, transparent 46%); }
+.featured.ink .scene-caption { color: #dfe2d7; background: rgba(20, 24, 26, .72); border-color: rgba(236, 238, 231, .16); }
+.featured.ink .feature-label { color: #d3ab52; background: rgba(20, 24, 26, .76); border-color: rgba(211, 171, 82, .32); }
+.featured.ink .hero-english { color: #8b9088; }
+.featured.ink .hero-subtitle { color: #d3ab52; }
+.featured.ink .hero-description { color: #c2c7bc; }
+.featured.ink .hero-play { color: #14181a; background: #f3f4ec; box-shadow: 0 6px 20px rgba(0, 0, 0, .45); }
+.featured.ink .hero-play:hover { background: #ffffff; box-shadow: 0 10px 26px rgba(0, 0, 0, .5); }
+.featured.ink .hero-detail { color: #c2c7bc; }
+.featured.ink .hero-detail:hover { color: #f3f4ec; }
+.featured.ink .featured-bottom { border-top-color: rgba(236, 238, 231, .16); }
+.featured.ink .feature-tab { color: #8b9088; }
+.featured.ink .feature-tab-number { color: #6f7570; }
+.featured.ink .feature-tab:hover { color: #e2e5d8; }
+.featured.ink .feature-tab.active { color: #f3f4ec; }
+.featured.ink .feature-tab.active .feature-tab-number { color: #e2674d; }
+.featured.ink .feature-tab.active i { background: #e2674d; box-shadow: none; }
+.featured.ink .featured-note { color: rgba(236, 238, 231, .42); }
 .scene-caption { position: absolute; top: 26px; right: 28px; display: flex; align-items: center; gap: 8px; color: rgba(235, 243, 225, 0.75); font-size: 10px; letter-spacing: 1px; background: rgba(14, 35, 26, 0.4); backdrop-filter: blur(8px); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); }
 .scene-caption .icon { width: 13px; height: 13px; }
 .featured-content { position: relative; padding: 36px 42px 90px; z-index: 1; max-width: 620px; }

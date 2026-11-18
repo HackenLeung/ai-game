@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f2f1ec">
+<meta name="description" content="静雷：一款现代简约的扫雷小游戏。三档预设与自定义棋盘，首次点击必安全，支持右键插旗、双击快速展开、键盘操作和自动续玩。">
+<title>静雷 · 数字雷区</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2323251f'/%3E%3Cg fill='%23f2f0e6'%3E%3Crect x='14' y='14' width='9' height='9' rx='2'/%3E%3Crect x='27.5' y='14' width='9' height='9' rx='2'/%3E%3Crect x='41' y='14' width='9' height='9' rx='2'/%3E%3Crect x='14' y='27.5' width='9' height='9' rx='2'/%3E%3Crect x='27.5' y='27.5' width='9' height='9' rx='2'/%3E%3Crect x='41' y='27.5' width='9' height='9' rx='2'/%3E%3Crect x='14' y='41' width='9' height='9' rx='2'/%3E%3Crect x='27.5' y='41' width='9' height='9' rx='2'/%3E%3Crect x='41' y='41' width='9' height='9' rx='2' fill='%23cf6244'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<svg class="ms-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6.5 21V2.8M4.5 21h4"/><path d="M6.5 3.5H18l-3.2 4 3.2 4H6.5Z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-mine" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.4" fill="currentColor"/><path d="M12 1.8v5.9M12 16.3v5.9M1.8 12h5.9M16.3 12h5.9M4.8 4.8l4.2 4.2M15 15l4.2 4.2M19.2 4.8 15 9M9 15l-4.2 4.2"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.4 8.6a2.7 2.7 0 0 1 5.2.9c0 1.9-2.6 2-2.6 4.4M12 17.6h.01"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5.5a4 4 0 0 1-8 0Z"/><path d="M8 5.5H5V8a3 3 0 0 0 3 3M16 5.5h3V8a3 3 0 0 1-3 3M12 13.5V18M8.5 21h7"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-.6 4M20 5v6h-6"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"/></symbol>
+  <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></symbol>
+</svg>
+
+<div class="ms-app" id="ms-app">
+  <header class="ms-head">
+    <div class="ms-brand">
+      <span class="ms-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><g fill="currentColor"><rect x="3.5" y="3.5" width="4.6" height="4.6" rx="1.2"/><rect x="9.7" y="3.5" width="4.6" height="4.6" rx="1.2"/><rect x="15.9" y="3.5" width="4.6" height="4.6" rx="1.2"/><rect x="3.5" y="9.7" width="4.6" height="4.6" rx="1.2"/><rect x="9.7" y="9.7" width="4.6" height="4.6" rx="1.2"/><rect x="15.9" y="9.7" width="4.6" height="4.6" rx="1.2"/><rect x="3.5" y="15.9" width="4.6" height="4.6" rx="1.2"/><rect x="9.7" y="15.9" width="4.6" height="4.6" rx="1.2"/></g><rect x="15.9" y="15.9" width="4.6" height="4.6" rx="1.2" fill="#cf6244"/></svg>
+      </span>
+      <div class="ms-brand-text">
+        <h1>静雷</h1>
+        <p>数字雷区 · 一格格看清</p>
+      </div>
+    </div>
+    <div class="ms-head-actions">
+      <span class="ms-best-chip" id="best-chip">最佳 <b id="best-value">—</b></span>
+      <button type="button" class="ms-icon-btn" id="records-btn" aria-label="成绩记录" title="成绩记录"><svg aria-hidden="true"><use href="#i-trophy"></use></svg></button>
+      <button type="button" class="ms-icon-btn" id="help-btn" aria-label="玩法说明" title="玩法说明"><svg aria-hidden="true"><use href="#i-help"></use></svg></button>
+      <button type="button" class="ms-btn ms-btn-solid" id="new-game">新局<span class="ms-kbd">R</span></button>
+    </div>
+  </header>
+
+  <section class="ms-hud" aria-label="棋盘设置与状态">
+    <div class="ms-levels" id="level-group" role="group" aria-label="切换棋盘大小">
+      <button type="button" class="ms-level" data-level="beginner" aria-pressed="true"><b>初级</b><span>9 × 9 · 10 雷</span></button>
+      <button type="button" class="ms-level" data-level="intermediate" aria-pressed="false"><b>中级</b><span>16 × 16 · 40 雷</span></button>
+      <button type="button" class="ms-level" data-level="expert" aria-pressed="false"><b>高级</b><span>16 × 30 · 99 雷</span></button>
+      <button type="button" class="ms-level" data-level="custom" aria-pressed="false"><b>自定义</b><span id="custom-summary">尺寸自选</span></button>
+    </div>
+    <div class="ms-stats">
+      <div class="ms-stat"><span>剩余雷</span><b id="mines-left">10</b></div>
+      <div class="ms-stat"><span>用时</span><b id="timer">00:00</b></div>
+      <div class="ms-stat"><span>进度</span><b id="progress">0%</b></div>
+    </div>
+  </section>
+
+  <main class="ms-stage" id="stage" aria-label="扫雷游戏">
+    <div class="ms-board-card" id="board-card">
+      <div class="ms-board-scroll" id="board-scroll">
+        <div class="ms-board" id="board" role="group" aria-label="雷区棋盘" aria-describedby="board-status"></div>
+      </div>
+      <div class="ms-result" id="result" hidden>
+        <button type="button" class="ms-result-close ms-icon-btn" id="result-close" aria-label="收起结算面板"><svg aria-hidden="true"><use href="#i-close"></use></svg></button>
+        <div class="ms-result-inner">
+          <p class="ms-eyebrow" id="result-eyebrow">FIELD CLEARED</p>
+          <h2 id="result-title">雷区清空</h2>
+          <p class="ms-result-meta" id="result-meta">用时 00:00</p>
+          <div class="ms-result-actions">
+            <button type="button" class="ms-btn ms-btn-solid" id="result-again">再来一局</button>
+            <button type="button" class="ms-btn" id="result-inspect">查看棋盘</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ms-under">
+      <p class="ms-status" id="board-status" role="status" aria-live="polite"><span class="ms-live" aria-hidden="true"></span><span id="status-text">点击任意格子开始</span></p>
+      <p class="ms-scroll-hint" id="scroll-hint" hidden>左右滑动查看完整棋盘</p>
+    </div>
+  </main>
+
+  <footer class="ms-foot">
+    <div class="ms-legend">
+      <span><i class="ms-dot ms-dot-open" aria-hidden="true"></i>翻开</span>
+      <span><svg aria-hidden="true"><use href="#i-flag"></use></svg>插旗</span>
+      <span><svg aria-hidden="true"><use href="#i-mine"></use></svg>地雷</span>
+    </div>
+    <div class="ms-tips">
+      <span class="ms-tip-pointer">左键翻开<span class="ms-sep" aria-hidden="true"></span>右键 / 长按插旗<span class="ms-sep" aria-hidden="true"></span>双击数字快速展开</span>
+      <span class="ms-tip-touch">轻点翻开 · 长按插旗 · 轻点数字快速展开</span>
+      <span class="ms-tips-key"><svg aria-hidden="true"><use href="#i-keyboard"></use></svg>方向键移动 · 空格翻开 · F 插旗</span>
+    </div>
+  </footer>
+</div>
+
+<dialog class="ms-dialog" id="help-dialog" aria-labelledby="help-title">
+  <div class="ms-dialog-head">
+    <div><p class="ms-eyebrow">HOW TO PLAY</p><h2 id="help-title">玩法说明</h2></div>
+    <button type="button" class="ms-icon-btn" data-close aria-label="关闭玩法说明"><svg aria-hidden="true"><use href="#i-close"></use></svg></button>
+  </div>
+  <div class="ms-dialog-body">
+    <ul class="ms-help-list">
+      <li><span aria-hidden="true">01</span><p><b>翻开所有安全格。</b>数字表示周围八格的地雷数量，没有数字的空地会自动连锁展开。</p></li>
+      <li><span aria-hidden="true">02</span><p><b>首次点击不会踩雷。</b>布雷会避开第一次点击的九宫格，通常能直接打开一片空地。</p></li>
+      <li><span aria-hidden="true">03</span><p><b>先判断，再落手。</b>右键或手机长按插旗；已翻开的数字周围旗数正确时，双击它（按 C，手机上轻点数字）可以快速翻开其余格子。</p></li>
+      <li><span aria-hidden="true">04</span><p><b>尺寸随你挑。</b>初级 9 × 9、中级 16 × 16、高级 16 × 30，也可以自定义 5–30 行、5–40 列与雷数。</p></li>
+    </ul>
+    <div class="ms-keymap">
+      <p class="ms-eyebrow">KEYBOARD</p>
+      <div class="ms-keys">
+        <span><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd>移动</span>
+        <span><kbd>空格</kbd>翻开</span>
+        <span><kbd>F</kbd>插旗</span>
+        <span><kbd>C</kbd>快速展开</span>
+        <span><kbd>R</kbd>新局</span>
+      </div>
+    </div>
+    <p class="ms-dialog-note">进度会自动保存在当前浏览器。清空浏览器数据或更换设备后，可从同样的入口重新开始。</p>
+  </div>
+</dialog>
+
+<dialog class="ms-dialog" id="records-dialog" aria-labelledby="records-title">
+  <div class="ms-dialog-head">
+    <div><p class="ms-eyebrow">PERSONAL BEST</p><h2 id="records-title">成绩记录</h2></div>
+    <button type="button" class="ms-icon-btn" data-close aria-label="关闭成绩记录"><svg aria-hidden="true"><use href="#i-close"></use></svg></button>
+  </div>
+  <div class="ms-dialog-body">
+    <ul class="ms-records" id="records-list"></ul>
+    <p class="ms-dialog-note">只记录胜利成绩。自定义棋盘按「行 × 列 · 雷数」分别保存。</p>
+    <button type="button" class="ms-text-btn" id="records-reset">清空成绩记录</button>
+  </div>
+</dialog>
+
+<dialog class="ms-dialog ms-dialog-sm" id="custom-dialog" aria-labelledby="custom-title">
+  <div class="ms-dialog-head">
+    <div><p class="ms-eyebrow">CUSTOM FIELD</p><h2 id="custom-title">自定义棋盘</h2></div>
+    <button type="button" class="ms-icon-btn" data-close aria-label="关闭自定义棋盘"><svg aria-hidden="true"><use href="#i-close"></use></svg></button>
+  </div>
+  <form class="ms-dialog-body" id="custom-form" novalidate>
+    <div class="ms-fields">
+      <label><span>行数</span><input id="custom-rows" type="number" inputmode="numeric" min="5" max="30" step="1" value="16"></label>
+      <label><span>列数</span><input id="custom-cols" type="number" inputmode="numeric" min="5" max="40" step="1" value="16"></label>
+      <label><span>雷数</span><input id="custom-mines" type="number" inputmode="numeric" min="1" step="1" value="40"></label>
+    </div>
+    <div class="ms-density">
+      <span>雷密度 <b id="custom-density">15.6%</b></span>
+      <span class="ms-density-track" aria-hidden="true"><i id="density-fill"></i></span>
+    </div>
+    <p class="ms-error" id="custom-error" role="alert"></p>
+    <div class="ms-dialog-actions">
+      <button type="button" class="ms-btn" data-close>取消</button>
+      <button type="submit" class="ms-btn ms-btn-solid" id="custom-start">开始新局</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="ms-dialog ms-dialog-sm" id="confirm-dialog" aria-labelledby="confirm-title">
+  <div class="ms-dialog-body">
+    <p class="ms-eyebrow">NEW FIELD</p>
+    <h2 id="confirm-title">开始新的一局？</h2>
+    <p class="ms-confirm-text" id="confirm-text">当前进度会丢失，最佳成绩不会受影响。</p>
+    <div class="ms-dialog-actions">
+      <button type="button" class="ms-btn" id="confirm-cancel">继续本局</button>
+      <button type="button" class="ms-btn ms-btn-solid" id="confirm-ok">重新开始</button>
+    </div>
+  </div>
+</dialog>
+
+<div class="ms-toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="rules.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

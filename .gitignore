@@ -2,6 +2,7 @@ node_modules/
 dist/
 .playwright/
 test-results/
+.cache/
 *.log
 .DS_Store
 Thumbs.db

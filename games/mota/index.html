@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#101725">
+  <meta name="description" content="魔塔 · 五十层：h5mota《50层魔塔》的复刻。地图、怪物数值、道具、商店与事件照原塔，视觉沿用像素地牢。没有随机数，每一场战斗的代价都写在敌人脚下。">
+  <title>魔塔 · 五十层</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23101725'/%3E%3Cpath d='M32 10 46 18v28L32 54 18 46V18Z' fill='none' stroke='%23edf0df' stroke-width='3'/%3E%3Cpath d='M26 32h12M32 26v12' stroke='%23ec7670' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="h5data/tiles.js" defer></script>
+  <script src="h5data/enemys.js" defer></script>
+  <script src="h5data/items.js" defer></script>
+  <script src="h5data/floors.js" defer></script>
+  <script src="h5data/commonEvents.js" defer></script>
+  <script src="data.js" defer></script>
+  <script src="rules.js" defer></script>
+  <script src="events.js" defer></script>
+  <script src="engine.js" defer></script>
+<script src="route.js" defer></script>
+  <script src="sprites.js" defer></script>
+  <script src="view.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <!-- 界面线条图标（24×24）：像素角色与道具由 sprites.js 生成 symbol。 -->
+  <svg class="sprite" id="sprite-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="g-arrow-up" viewBox="0 0 24 24"><path d="M12 20V5m-6 6 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="g-arrow-down" viewBox="0 0 24 24"><path d="M12 4v15m-6-6 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="g-arrow-left" viewBox="0 0 24 24"><path d="M20 12H5m6-6-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="g-arrow-right" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="g-book" viewBox="0 0 24 24"><path d="M3.4 4.6h6.4c1.2 0 2.2.9 2.2 2v13c0-1.1-1-2-2.2-2H3.4Zm17.2 0h-6.4c-1.2 0-2.2.9-2.2 2v13c0-1.1 1-2 2.2-2h6.4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="g-undo" viewBox="0 0 24 24"><path d="M9.4 5.2 5 9.6l4.4 4.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.4 9.6h8.2a5.2 5.2 0 0 1 0 10.4h-3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="g-ladder" viewBox="0 0 24 24"><path d="M8 2.6v18.8M16 2.6v18.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M8 7.4h8M8 12h8M8 16.6h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="g-stairs-up" viewBox="0 0 24 24"><path d="M2.6 21.4h4.2v-4.2h4.2v-4.2h4.2V8.8h4.2V4.6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M19.4 2.2v3.4h-3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="g-stairs-down" viewBox="0 0 24 24"><path d="M2.6 2.6h4.2v4.2h4.2v4.2h4.2v4.2h4.2v4.2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><path d="M19.4 21.8v-3.4h-3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="g-door" viewBox="0 0 24 24"><path d="M5.4 22V4.4A1.6 1.6 0 0 1 7 2.8h10a1.6 1.6 0 0 1 1.6 1.6V22" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M3 22h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="15.4" cy="12.4" r="1.4" fill="currentColor"/></symbol>
+      <symbol id="g-hp" viewBox="0 0 24 24"><path d="M12 21S3.2 15.4 3.2 9.2A4.8 4.8 0 0 1 12 6.4a4.8 4.8 0 0 1 8.8 2.8C20.8 15.4 12 21 12 21Z" fill="currentColor"/></symbol>
+      <symbol id="g-atk" viewBox="0 0 24 24"><path d="M14 2.4 21.4 1.4 20.4 8.8 11.8 17.4 9 14.6Z" fill="currentColor"/><path d="m5.4 12.4 6.2 6.2M8.4 15.4 2.6 21.2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="g-def" viewBox="0 0 24 24"><path d="M12 2.4 20.4 5.8v6.2c0 4.6-3.6 8-8.4 9.6-4.8-1.6-8.4-5-8.4-9.6V5.8Z" fill="currentColor"/></symbol>
+      <symbol id="g-gold" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 7.4v9.2M9.4 10h5.2M9.4 14h5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+      <symbol id="g-floor" viewBox="0 0 24 24"><path d="M3 6.6 12 2.4l9 4.2-9 4.2Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M3 12.2 12 16.4l9-4.2M3 17.4 12 21.6l9-4.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+      <symbol id="g-bag" viewBox="0 0 24 24"><path d="M6 8.4h12l1.6 12.2H4.4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8.4V6a3 3 0 0 1 6 0v2.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="g-sound" viewBox="0 0 24 24"><path d="M4 9.4h3.6L13 5v14L7.6 14.6H4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M16.4 9a4.4 4.4 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="g-mute" viewBox="0 0 24 24"><path d="M4 9.4h3.6L13 5v14L7.6 14.6H4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m16.4 9.4 5 5.2m0-5.2-5 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="g-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5.4l3.4 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="shell">
+    <header class="bar">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4 19.4 6.8v10.4L12 21.6 4.6 17.2V6.8Z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 7.6v8.8M8.6 12h6.8" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="brand-text">魔塔<small>· 五十层</small></span>
+      </div>
+
+      <div class="bar-meter" aria-label="楼层进度">
+        <b id="meter-now">01</b><span id="meter-total">/ 51</span>
+        <span class="bar-meter-track" aria-hidden="true"><i id="meter-fill"></i></span>
+      </div>
+
+      <nav class="bar-tools" aria-label="工具">
+        <button type="button" class="tool" id="btn-manual" aria-label="怪物手册（X）" aria-keyshortcuts="X" title="怪物手册（X）"><svg class="icon" aria-hidden="true"><use href="#g-book"/></svg><span class="tool-text">手册</span><kbd>X</kbd></button>
+        <button type="button" class="tool" id="btn-fly" aria-label="楼传（G）" aria-keyshortcuts="G" title="楼传：飞向到过的楼层（G）"><svg class="icon" aria-hidden="true"><use href="#g-ladder"/></svg><span class="tool-text">楼传</span><kbd>G</kbd></button>
+        <button type="button" class="tool" id="btn-save" aria-label="存档（S）" aria-keyshortcuts="S" title="存档（S）"><span class="tool-text">存档</span><kbd>S</kbd></button>
+        <button type="button" class="tool" id="btn-load" aria-label="读档（L）" aria-keyshortcuts="L" title="读档、导出与导入（L）"><span class="tool-text">读档</span><kbd>L</kbd></button>
+        <button type="button" class="tool" id="btn-undo" aria-label="撤销上一步（Ctrl+Z）" aria-keyshortcuts="Control+Z" title="撤销上一步（Ctrl+Z）" disabled><svg class="icon" aria-hidden="true"><use href="#g-undo"/></svg><span class="tool-text">撤销</span></button>
+        <button type="button" class="tool" id="btn-help" aria-label="帮助" title="游戏帮助"><span class="tool-text">帮助</span></button>
+        <button type="button" class="tool" id="btn-restart" aria-label="重新开始" title="重新开始（会清空当前进度）"><span class="tool-text">重新开始</span></button>
+        <button type="button" class="tool tool-icon" id="btn-sound" aria-label="音效开关" aria-pressed="true" title="音效"><svg class="icon" aria-hidden="true"><use id="sound-use" href="#g-sound"/></svg></button>
+      </nav>
+    </header>
+
+    <main class="tower">
+      <section class="stage" aria-label="本层">
+        <div class="stage-head">
+          <span class="stage-numeral" id="floor-numeral">01</span>
+          <div class="stage-text">
+            <p class="eyebrow" id="floor-eyebrow">FLOOR 01 / 51</p>
+            <h1 class="stage-name" id="floor-name">第 1 层</h1>
+            <p class="stage-note" id="floor-note">塔门。石门在身后合拢。</p>
+          </div>
+          <div class="stage-legend" aria-hidden="true">
+            <span><i class="dot dot-floor"></i>可走</span>
+            <span><i class="dot dot-wall"></i>石墙</span>
+            <span><svg class="icon"><use href="#g-stairs-up"/></svg>上楼</span>
+          </div>
+        </div>
+
+        <div class="board-slot">
+        <div class="board-frame" id="board-frame">
+          <div class="board" id="mota-map" tabindex="0" role="application" aria-label="本层地图：方向键移动一格；点击能走到的格子会自动走过去；撞向敌人即战斗"></div>
+          <div class="float-layer" id="float-layer" aria-hidden="true"></div>
+          <div class="player" id="player" aria-hidden="true"><svg class="glyph"><use href="#sp-hero-hero"/></svg></div>
+
+          <div class="boot" id="boot">
+            <span class="boot-spin" aria-hidden="true"></span>
+            <p>载入中…</p>
+            <small>正在等待魔塔引擎</small>
+          </div>
+
+          <div class="battle" id="battle" hidden aria-hidden="true">
+            <div class="battle-stage">
+              <p class="battle-head" id="battle-head">交锋</p>
+              <div class="battle-side battle-hero">
+                <svg class="battle-figure" viewBox="0 0 24 24" aria-hidden="true"><use href="#sp-hero-hero"/></svg>
+              </div>
+              <div class="battle-side battle-foe">
+                <svg class="battle-figure" viewBox="0 0 24 24" aria-hidden="true"><use id="battle-foe-use" href="#sp-slime-moss"/></svg>
+              </div>
+
+              <div class="battle-boards">
+                <div class="battle-board battle-board-hero">
+                  <span class="board-side">你</span>
+                  <dl class="board-stats">
+                    <div><dt>生命</dt><dd id="battle-hero-hp">—</dd></div>
+                    <div><dt>攻击</dt><dd id="battle-hero-atk">—</dd></div>
+                    <div><dt>防御</dt><dd id="battle-hero-def">—</dd></div>
+                    <div><dt>回合</dt><dd id="battle-hero-turns">—</dd></div>
+                  </dl>
+                  <i class="board-bar board-bar-hero" id="battle-hero-bar" aria-hidden="true"></i>
+                </div>
+                <span class="battle-vs" aria-hidden="true">VS</span>
+                <div class="battle-board battle-board-foe">
+                  <span class="board-side" id="battle-board-foe-name">敌人</span>
+                  <dl class="board-stats">
+                    <div><dt>生命</dt><dd id="battle-foe-hp">—</dd></div>
+                    <div><dt>攻击</dt><dd id="battle-foe-atk">—</dd></div>
+                    <div><dt>防御</dt><dd id="battle-foe-def">—</dd></div>
+                    <div><dt>金币</dt><dd id="battle-foe-money">—</dd></div>
+                  </dl>
+                  <i class="board-bar board-bar-foe" id="battle-foe-bar" aria-hidden="true"></i>
+                </div>
+              </div>
+
+              <p class="battle-damage" id="battle-damage">-0</p>
+              <p class="battle-note" id="battle-note"></p>
+            </div>
+            <button type="button" class="battle-skip" id="battle-skip" aria-label="跳过战斗演出">跳过</button>
+          </div>
+        </div>
+        </div>
+
+        <div class="dialog" id="dialog" data-mode="idle" aria-live="polite">
+          <div class="dialog-face" id="dialog-face" hidden aria-hidden="true"><svg class="glyph"><use id="dialog-face-use" href="#sp-oldman-brown"/></svg></div>
+          <div class="dialog-main">
+            <p class="dialog-name" id="dialog-name" hidden></p>
+            <p class="dialog-text" id="dialog-text">方向键 / WASD 移动 · 点地图上能走的地方会自动走过去</p>
+            <div class="dialog-choices" id="dialog-choices" role="group" aria-label="选项"></div>
+            <p class="dialog-hint" id="dialog-hint"></p>
+          </div>
+          <button type="button" class="dialog-next" id="dialog-next" hidden aria-label="继续">继续</button>
+        </div>
+
+        <div class="toolbar-shell" id="toolbar-shell">
+          <div class="toolbar" id="toolbar" role="toolbar" aria-label="道具" hidden></div>
+          <span class="toolbar-more" id="toolbar-more" hidden aria-hidden="true">›</span>
+        </div>
+
+        <div class="pad" id="pad" role="group" aria-label="移动">
+          <button type="button" class="pad-key pad-up" data-dir="up" aria-label="上"><svg class="icon" aria-hidden="true"><use href="#g-arrow-up"/></svg></button>
+          <button type="button" class="pad-key pad-left" data-dir="left" aria-label="左"><svg class="icon" aria-hidden="true"><use href="#g-arrow-left"/></svg></button>
+          <button type="button" class="pad-key pad-right" data-dir="right" aria-label="右"><svg class="icon" aria-hidden="true"><use href="#g-arrow-right"/></svg></button>
+          <button type="button" class="pad-key pad-down" data-dir="down" aria-label="下"><svg class="icon" aria-hidden="true"><use href="#g-arrow-down"/></svg></button>
+        </div>
+      </section>
+
+      <aside class="deck" aria-label="状态">
+        <div class="hero-card">
+          <div class="hero-portrait" aria-hidden="true"><svg class="glyph"><use href="#sp-hero-hero"/></svg></div>
+          <div class="hero-meta">
+            <b class="hero-name">勇士</b>
+            <span class="hero-sub" id="hero-sub">塔下村的剑客</span>
+          </div>
+        </div>
+
+        <div class="panel panel-hp">
+          <div class="panel-head">
+            <span class="panel-label"><svg class="icon" aria-hidden="true"><use href="#g-hp"/></svg>生命</span>
+            <strong class="hp-value" id="stat-hp">1000</strong>
+          </div>
+          <span class="hp-track" aria-hidden="true"><i id="hp-fill"></i></span>
+        </div>
+
+        <div class="panel panel-grid">
+          <div class="stat">
+            <span class="stat-label"><svg class="icon" aria-hidden="true"><use href="#g-atk"/></svg>攻击</span>
+            <strong class="stat-value" id="stat-atk">100</strong>
+          </div>
+          <div class="stat">
+            <span class="stat-label"><svg class="icon" aria-hidden="true"><use href="#g-def"/></svg>防御</span>
+            <strong class="stat-value" id="stat-def">100</strong>
+          </div>
+          <div class="stat">
+            <span class="stat-label"><svg class="icon" aria-hidden="true"><use href="#g-gold"/></svg>金币</span>
+            <strong class="stat-value" id="stat-gold">0</strong>
+          </div>
+        </div>
+
+        <div class="panel panel-keys">
+          <span class="panel-label">钥匙</span>
+          <span class="key-pills">
+            <span class="key-pill key-y" title="黄钥匙"><svg class="icon" aria-hidden="true"><use href="#sp-key-brass"/></svg><b id="key-y">0</b></span>
+            <span class="key-pill key-b" title="蓝钥匙"><svg class="icon" aria-hidden="true"><use href="#sp-key-azure"/></svg><b id="key-b">0</b></span>
+            <span class="key-pill key-r" title="红钥匙"><svg class="icon" aria-hidden="true"><use href="#sp-key-crimson"/></svg><b id="key-r">0</b></span>
+          </span>
+        </div>
+
+        <div class="panel panel-status" id="panel-status" hidden>
+          <p class="panel-label">状态</p>
+          <div class="status-chips" id="status-chips"></div>
+        </div>
+
+        <div class="panel panel-floor">
+          <div class="panel-head">
+            <span class="panel-label"><svg class="icon" aria-hidden="true"><use href="#g-floor"/></svg>楼层</span>
+            <strong class="stat-value" id="stat-floor">1 / 51</strong>
+          </div>
+          <p class="floor-note" id="floor-ratio">本层物资 ×1</p>
+          <p class="floor-remains" id="floor-remains">怪物 0 · 宝物 0</p>
+        </div>
+
+        <div class="panel panel-items">
+          <p class="panel-label"><svg class="icon" aria-hidden="true"><use href="#g-bag"/></svg>道具</p>
+          <ul class="item-list" id="item-list"><li class="item-empty">还没有常驻道具</li></ul>
+        </div>
+
+        <div class="panel panel-hints">
+          <p class="panel-label"><svg class="icon" aria-hidden="true"><use href="#g-book"/></svg>快捷键</p>
+          <dl class="hint-list">
+            <div><dt>移动</dt><dd>方向键 / WASD</dd></div>
+            <div><dt>手册</dt><dd>X</dd></div>
+            <div><dt>楼传</dt><dd>G</dd></div>
+            <div><dt>存档 / 读档</dt><dd>S / L</dd></div>
+            <div><dt>撤销</dt><dd>Ctrl + Z</dd></div>
+            <div><dt>取消</dt><dd>Esc</dd></div>
+          </dl>
+        </div>
+
+        <ol class="log" id="log" aria-live="polite" aria-label="最近发生"></ol>
+      </aside>
+    </main>
+  </div>
+
+  <div class="ending" id="ending" hidden>
+    <div class="ending-card" role="dialog" aria-modal="true" aria-labelledby="ending-title">
+      <p class="eyebrow" id="ending-kind">特性版 · NE</p>
+      <h2 class="ending-title" id="ending-title">塔顶</h2>
+      <p class="ending-text" id="ending-reason"></p>
+      <dl class="ending-stats" id="ending-stats"></dl>
+      <div class="ending-actions">
+        <button type="button" class="btn btn-primary" id="ending-again">再爬一次</button>
+        <button type="button" class="btn btn-quiet" id="ending-close">留在这里</button>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="sheet" id="sheet" aria-labelledby="sheet-title">
+    <div class="sheet-head">
+      <div>
+        <p class="eyebrow" id="sheet-kicker">资料</p>
+        <h2 id="sheet-title">手册</h2>
+      </div>
+      <button type="button" class="sheet-close" id="sheet-close" aria-label="关闭">×</button>
+    </div>
+    <div class="sheet-body" id="sheet-body"></div>
+  </dialog>
+
+  <div class="tile-tip" id="tile-tip" role="tooltip" hidden>
+    <b class="tile-tip-title" id="tile-tip-title"></b>
+    <span class="tile-tip-sub" id="tile-tip-sub"></span>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <p class="sr-only" id="announce" aria-live="polite"></p>
+
+  <noscript><p class="noscript">这个游戏需要 JavaScript 才能运行。</p></noscript>
+</body>
+</html>

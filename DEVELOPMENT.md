@@ -31,7 +31,7 @@
 
 ## 存档与数据
 
-- 保持存档键稳定：大厅 `youjian-library-v1`、逸剑风云决 `wandering-sword-v1`、余烬 `ember-wilderness-save-v1`、深渊回响 `abyss-echo-save-v1`。新游戏使用独立且明确的存档键。
+- 保持存档键稳定：大厅 `youjian-library-v1`、逸剑风云决 `wandering-sword-v1`、余烬 `ember-wilderness-save-v1`、深渊回响 `abyss-echo-save-v1`、静雷 `minesweeper-save-v1` / `minesweeper-records-v1`、魔塔 `magic-tower-51-v1`。新游戏使用独立且明确的存档键。
 - AI 游玩的模型配置是本地设置而非发布内容：只写进被忽略的 `.ai-config.json`（可用 `AI_CONFIG_PATH` 改路径），密钥不得提交、不得进入 `dist/`、不得回传给浏览器。配置文件读不出来时先备份成 `.ai-config.json.recovery`，再用预设生成一份。
 - 大厅不读写游戏进度。打开游戏、返回大厅、调整布局或修改规则时，不自动清空存档或开始新周目。
 - 变更存档结构应保留版本识别、旧版本兼容与必要的迁移备份；不要静默丢弃可恢复数据。导入前验证结构和值，读取失败时给出可理解的反馈。
@@ -47,8 +47,9 @@
 | `npm start` | 启动源码预览，默认 `http://127.0.0.1:4177/` |
 | `npm run build` | 生成可发布的静态文件到 `dist/` |
 | `npm run preview` | 预览已构建的 `dist/`，默认端口同上 |
-| `npm test` | 大厅与访问边界、三款游戏规则及主线策略验证 |
+| `npm test` | 大厅与访问边界、各游戏规则及主线策略验证 |
 | `npm run test:browser` | 在真实浏览器中验证源码和交互 |
+| `npm run test:browser:mota` | 魔塔专项浏览器验证（真实按键走位、撞怪、手册、存档、手机视口） |
 | `npm run test:browser:dist` | 在真实浏览器中验证构建产物 |
 | `npm run ai:play` | 让大模型读取真实画面并操作游戏，过程写入 `test-results/`；`--engine=jev` 改用 jev 决策模型 |
 

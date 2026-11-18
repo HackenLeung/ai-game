@@ -24,6 +24,8 @@
     sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>',
     deck: '<rect x="3" y="4" width="12" height="17" rx="2"/><path d="M8 4V3h11a2 2 0 0 1 2 2v13h-1"/><path d="M6 8h6M6 12h6M6 16h4"/>',
     tile: '<rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="8.5" r="1.5"/><path d="M8.5 13.5h7M12 12.5v6"/>',
+    tower: '<path d="M12 2.5 19 6.7v10.6L12 21.5 5 17.3V6.7Z"/><path d="M12 7.5v9M8.6 12h6.8"/>',
+    mine: '<circle cx="12" cy="12" r="3.7"/><path d="M12 2v3.4M12 18.6V22M2 12h3.4M18.6 12H22M4.9 4.9l2.4 2.4M16.7 16.7l2.4 2.4M19.1 4.9l-2.4 2.4M7.3 16.7l-2.4 2.4"/>',
     spark: '<path d="M12 3l1.9 6.1L20 12l-6.1 2.9L12 21l-1.9-6.1L4 12l6.1-2.9Z"/><path d="M18.5 4.5 19 6l1.5.5L19 7l-.5 1.5L18 7l-1.5-.5L18 6Z"/>'
   };
   const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
